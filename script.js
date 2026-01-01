@@ -1,7 +1,18 @@
+// Force scroll on load
+if (history.scrollRestoration) {
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.add("loaded");
 
     gsap.registerPlugin(ScrollTrigger);
+    gsap.ticker.lagSmoothing(0);
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const supportsClipPath = CSS.supports("clip-path", "inset(10% 10% 10% 10% round 20px)");
+    const allowCustomCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     const lenis = new Lenis({
         lerp: 0.08,
@@ -9,21 +20,165 @@ document.addEventListener("DOMContentLoaded", () => {
         smoothWheel: true,
     });
 
-    lenis.on("scroll", ScrollTrigger.update);
+    const nav = document.querySelector(".nav");
+    let lastNavScroll = 0;
+    const navRevealOffset = 120;
+    const navDelta = 6;
 
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
+    lenis.on("scroll", (event) => {
+        ScrollTrigger.update();
+
+        if (!nav) {
+            return;
+        }
+
+        const currentScroll = event.scroll;
+        const delta = currentScroll - lastNavScroll;
+
+        if (Math.abs(delta) < navDelta) {
+            return;
+        }
+
+        if (currentScroll <= navRevealOffset) {
+            nav.classList.remove("is-hidden");
+        } else if (delta > 0) {
+            nav.classList.add("is-hidden");
+        } else {
+            nav.classList.remove("is-hidden");
+        }
+
+        lastNavScroll = currentScroll;
+    });
+
+    gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+    });
+
+    // Custom cursor removed
+
+    // Star Streak Spawner (Hero Grid) - Vertical streaks along grid lines
+    if (!prefersReducedMotion) {
+        const starLayer = document.querySelector(".grid-star-layer");
+        if (starLayer) {
+            const maxConcurrent = 3;
+            let activeStreaks = 0;
+
+            function spawnStreak() {
+                if (activeStreaks >= maxConcurrent) return;
+
+                const streak = document.createElement("span");
+                streak.className = "grid-streak";
+
+                // Position on grid lines (80px intervals match the grid)
+                const gridInterval = 80;
+                const layerWidth = starLayer.offsetWidth || 1000;
+                const numColumns = Math.floor(layerWidth / gridInterval);
+                const column = Math.floor(Math.random() * numColumns);
+                const xPos = column * gridInterval;
+
+                // Randomize vertical properties
+                const len = 120 + Math.random() * 100;    // 120-220px length
+                const travel = 300 + Math.random() * 200; // 300-500px travel distance
+                const dur = 2500 + Math.random() * 1500;  // 2.5-4s duration (slow)
+
+                streak.style.cssText = `
+                    left: ${xPos}px;
+                    top: -${len}px;
+                    --streak-len: ${len}px;
+                    --streak-travel: ${travel + len}px;
+                    animation: streak-vertical ${dur}ms linear 1;
+                `;
+
+                starLayer.appendChild(streak);
+                activeStreaks++;
+
+                streak.addEventListener("animationend", () => {
+                    streak.remove();
+                    activeStreaks--;
+                });
+            }
+
+            function schedule() {
+                const next = 2000 + Math.random() * 2000; // 2-4s between spawns (slower)
+                setTimeout(() => {
+                    spawnStreak();
+                    schedule();
+                }, next);
+            }
+            schedule();
+
+            // Horizontal streaks along grid rows
+            let activeHorizontal = 0;
+            const maxHorizontal = 2;
+
+            function spawnHorizontalStreak() {
+                if (activeHorizontal >= maxHorizontal) return;
+
+                const streak = document.createElement("span");
+                streak.className = "grid-streak-h";
+
+                // Position on grid rows (80px intervals)
+                const gridInterval = 80;
+                const layerHeight = starLayer.offsetHeight || 600;
+                const numRows = Math.floor(layerHeight / gridInterval);
+                const row = Math.floor(Math.random() * numRows);
+                const yPos = row * gridInterval;
+
+                const len = 120 + Math.random() * 100;
+                const travel = 400 + Math.random() * 300;
+                const dur = 3000 + Math.random() * 2000;
+
+                streak.style.cssText = `
+                    left: -${len}px;
+                    top: ${yPos}px;
+                    --streak-len: ${len}px;
+                    --streak-travel: ${travel + len}px;
+                    animation: streak-horizontal ${dur}ms linear 1;
+                `;
+
+                starLayer.appendChild(streak);
+                activeHorizontal++;
+
+                streak.addEventListener("animationend", () => {
+                    streak.remove();
+                    activeHorizontal--;
+                });
+            }
+
+            function scheduleHorizontal() {
+                const next = 3000 + Math.random() * 3000; // 3-6s between spawns
+                setTimeout(() => {
+                    spawnHorizontalStreak();
+                    scheduleHorizontal();
+                }, next);
+            }
+            scheduleHorizontal();
+        }
     }
-    requestAnimationFrame(raf);
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const supportsClipPath = CSS.supports("clip-path", "inset(10% 10% 10% 10% round 20px)");
+    // Hero Audio Player
+    const audioBtn = document.getElementById("heroAudioBtn");
+    const heroAudio = document.getElementById("heroAudio");
+    if (audioBtn && heroAudio) {
+        audioBtn.addEventListener("click", () => {
+            if (heroAudio.paused) {
+                heroAudio.play();
+                audioBtn.classList.add("playing");
+                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+            } else {
+                heroAudio.pause();
+                audioBtn.classList.remove("playing");
+                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>';
+            }
+        });
 
-    const heroBackup = document.querySelector(".hero-title-backup");
-    const heroSplit = heroBackup && window.SplitType
-        ? new SplitType(heroBackup, { types: "chars" })
-        : null;
+        heroAudio.addEventListener("ended", () => {
+            audioBtn.classList.remove("playing");
+            audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>';
+        });
+    }
+
+    const heroEmbed = document.querySelector(".hero-embed");
 
     const spotlightTargets = document.querySelectorAll(
         ".glass-card, .service-card, .cta-panel, .metric-card, .project-card"
@@ -39,69 +194,113 @@ document.addEventListener("DOMContentLoaded", () => {
             border.className = "spotlight-border";
             border.setAttribute("aria-hidden", "true");
 
+            const reflection = document.createElement("span");
+            reflection.className = "glass-reflection";
+            reflection.setAttribute("aria-hidden", "true");
+
+            card.prepend(reflection);
             card.prepend(border);
             card.prepend(layer);
         }
+
+        let rect = null;
+        let currentX = 0;
+        let currentY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let rafId = null;
+
+        const updateSpotlight = () => {
+            currentX += (targetX - currentX) * 0.22;
+            currentY += (targetY - currentY) * 0.22;
+
+            card.style.setProperty("--mouse-x", `${currentX}px`);
+            card.style.setProperty("--mouse-y", `${currentY}px`);
+
+            rafId = requestAnimationFrame(updateSpotlight);
+        };
+
+        const setTarget = (event) => {
+            if (!rect) {
+                rect = card.getBoundingClientRect();
+            }
+            targetX = event.clientX - rect.left;
+            targetY = event.clientY - rect.top;
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(updateSpotlight);
+            }
+        };
+
+        card.addEventListener("pointerenter", (event) => {
+            if (event.pointerType && event.pointerType !== "mouse") {
+                return;
+            }
+            rect = card.getBoundingClientRect();
+            currentX = event.clientX - rect.left;
+            currentY = event.clientY - rect.top;
+            targetX = currentX;
+            targetY = currentY;
+            card.style.setProperty("--spotlight-opacity", "1");
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(updateSpotlight);
+            }
+        });
 
         card.addEventListener("pointermove", (event) => {
             if (event.pointerType && event.pointerType !== "mouse") {
                 return;
             }
-            const rect = card.getBoundingClientRect();
-            card.style.setProperty("--mouse-x", `${event.clientX - rect.left}px`);
-            card.style.setProperty("--mouse-y", `${event.clientY - rect.top}px`);
-            card.style.setProperty("--spotlight-opacity", "1");
-        });
+            setTarget(event);
+        }, { passive: true });
 
         card.addEventListener("pointerleave", () => {
             card.style.setProperty("--spotlight-opacity", "0");
+            rect = null;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
         });
     });
 
-    if (!prefersReducedMotion) {
-        const magneticButtons = document.querySelectorAll(".magnetic-btn");
+    const magneticButtons = document.querySelectorAll(".btn, .nav-cta");
 
-        magneticButtons.forEach((btn) => {
-            const text = btn.querySelector(".btn-text");
+    magneticButtons.forEach((btn) => {
+        if (!btn.querySelector(".btn-sheen")) {
+            const sheen = document.createElement("span");
+            sheen.className = "btn-sheen";
+            sheen.setAttribute("aria-hidden", "true");
+            btn.appendChild(sheen);
+        }
 
-            btn.addEventListener("mousemove", (event) => {
-                const rect = btn.getBoundingClientRect();
-                const strength = parseFloat(btn.getAttribute("data-strength") || "30");
-                const x = event.clientX - rect.left - rect.width / 2;
-                const y = event.clientY - rect.top - rect.height / 2;
+        btn.addEventListener("pointerenter", () => {
+            const sheen = btn.querySelector(".btn-sheen");
+            if (!sheen || prefersReducedMotion) {
+                return;
+            }
 
-                gsap.to(btn, {
-                    x: x * (strength / 100),
-                    y: y * (strength / 100),
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-
-                if (text) {
-                    gsap.to(text, {
-                        x: x * (strength / 150),
-                        y: y * (strength / 150),
-                        duration: 0.3,
-                        ease: "power2.out"
-                    });
-                }
-            });
-
-            btn.addEventListener("mouseleave", () => {
-                const targets = text ? [btn, text] : [btn];
-                gsap.to(targets, {
-                    x: 0,
-                    y: 0,
-                    duration: 0.8,
-                    ease: "elastic.out(1, 0.35)"
-                });
+            gsap.fromTo(sheen, {
+                x: "-120%",
+                opacity: 0.6
+            }, {
+                x: "220%",
+                opacity: 0,
+                duration: 0.9,
+                ease: "power2.inOut"
             });
         });
-    }
+
+        // Magnetic pull effect removed
+    });
 
     const intro = gsap.timeline({
         defaults: { ease: "power3.out" }
     });
+
+    const heroWaveStart = "polygon(0 65%, 10% 60%, 20% 68%, 30% 58%, 40% 66%, 50% 55%, 60% 63%, 70% 52%, 80% 60%, 90% 48%, 100% 56%, 100% 100%, 0 100%)";
+    const heroWaveEnd = "polygon(0 0, 10% 0, 20% 0, 30% 0, 40% 0, 50% 0, 60% 0, 70% 0, 80% 0, 90% 0, 100% 0, 100% 100%, 0 100%)";
 
     if (supportsClipPath) {
         gsap.set(".hero-stage", {
@@ -133,70 +332,179 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 0.05);
     }
 
-    intro.from(".hero-top span", {
+    intro.fromTo(".hero-top span", {
         y: 16,
-        opacity: 0,
+        opacity: 0
+    }, {
+        y: 0,
+        opacity: 1,
         duration: 0.6,
         stagger: 0.12
     }, "-=0.7");
 
-    if (heroSplit) {
-        intro.set(heroBackup, { opacity: 1 });
-        intro.fromTo(heroSplit.chars, {
-            y: 80,
+    if (heroEmbed) {
+        if (supportsClipPath) {
+            gsap.set(heroEmbed, { clipPath: heroWaveStart });
+        }
+
+        intro.fromTo(heroEmbed, {
+            y: 42,
             opacity: 0,
-            rotateX: -45
+            filter: "blur(8px)"
         }, {
             y: 0,
             opacity: 1,
-            rotateX: 0,
-            duration: 1.1,
-            stagger: 0.03
+            filter: "blur(0px)",
+            duration: 1.05,
+            ease: "power2.out"
         }, "-=0.55");
-        intro.to(heroBackup, {
-            opacity: 0,
-            duration: 0.9
-        }, "-=0.6");
+
+        if (supportsClipPath) {
+            intro.to(heroEmbed, {
+                clipPath: heroWaveEnd,
+                duration: 1.1,
+                ease: "power2.out"
+            }, "-=1");
+        }
     } else {
-        intro.from(".hero-title", {
+        intro.fromTo(".hero-title", {
             y: 32,
-            opacity: 0,
+            opacity: 0
+        }, {
+            y: 0,
+            opacity: 1,
             duration: 0.9
         }, "-=0.55");
     }
 
-    intro.from(".hero-subtitle", {
+    intro.fromTo(".hero-subtitle", {
         y: 18,
-        opacity: 0,
+        opacity: 0
+    }, {
+        y: 0,
+        opacity: 1,
         duration: 0.6
     }, "-=0.55");
 
-    intro.from(".hero-lede", {
+    intro.fromTo(".hero-lede", {
         y: 18,
-        opacity: 0,
+        opacity: 0
+    }, {
+        y: 0,
+        opacity: 1,
         duration: 0.6
     }, "-=0.5");
 
-    intro.from(".hero-actions .btn", {
+    intro.fromTo(".hero-actions .btn", {
         y: 12,
-        opacity: 0,
+        opacity: 0
+    }, {
+        y: 0,
+        opacity: 1,
         duration: 0.55,
         stagger: 0.12
     }, "-=0.45");
 
-    intro.from(".hero-rail .rail-item", {
+    intro.fromTo(".hero-rail .rail-item", {
         y: 12,
-        opacity: 0,
+        opacity: 0
+    }, {
+        y: 0,
+        opacity: 1,
         duration: 0.5,
         stagger: 0.08
     }, "-=0.45");
 
-    intro.from(".hero-cards .glass-card", {
-        y: 36,
-        opacity: 0,
-        duration: 0.9,
-        stagger: 0.12
-    }, "-=0.2");
+    // Hero cards scroll animation (Restored + Video Parallax)
+    const heroCards = document.querySelector(".hero-cards");
+    if (heroCards) {
+        const cardCenter = document.querySelector(".hero-card-center");
+        const cardLeft = document.querySelector(".hero-card-left");
+        const cardRight = document.querySelector(".hero-card-right");
+
+        if (cardCenter && cardLeft && cardRight) {
+            let scrollAnimComplete = false;
+
+            // Initial states
+            gsap.set(cardCenter, { y: 120, opacity: 0 });
+            gsap.set(cardLeft, { x: -180, opacity: 0 });
+            gsap.set(cardRight, { x: 180, opacity: 0 });
+
+            const cardsTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: heroCards,
+                    start: "top 95%",
+                    end: "top 20%",
+                    scrub: 1.2,
+                    onEnter: () => { scrollAnimComplete = false; },
+                    onLeave: () => { scrollAnimComplete = true; },
+                    onEnterBack: () => { scrollAnimComplete = true; },
+                    onLeaveBack: () => { scrollAnimComplete = false; }
+                }
+            });
+
+            cardsTl.to(cardCenter, {
+                y: 0, opacity: 1, duration: 0.6, ease: "none"
+            });
+            cardsTl.to(cardLeft, {
+                x: 0, opacity: 1, duration: 0.4, ease: "none"
+            }, "-=0.2");
+            cardsTl.to(cardRight, {
+                x: 0, opacity: 1, duration: 0.4, ease: "none"
+            }, "<");
+
+            // Mouse Parallax for Cards + Videos
+            const allHeroCards = [cardLeft, cardCenter, cardRight];
+            const parallaxStrengths = [8, 5, 8];
+
+            heroCards.addEventListener("mousemove", (e) => {
+                if (!scrollAnimComplete) return;
+
+                const rect = heroCards.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const mouseX = e.clientX - rect.left - centerX;
+                const mouseY = e.clientY - rect.top - centerY;
+
+                const normX = mouseX / centerX;
+                const normY = mouseY / centerY;
+
+                allHeroCards.forEach((card, i) => {
+                    const strength = parallaxStrengths[i];
+                    const video = card.querySelector(".card-floating-video");
+
+                    // Card Movement
+                    gsap.to(card, {
+                        x: normX * strength,
+                        y: normY * strength * 0.4,
+                        rotateY: normX * 2,
+                        rotateX: -normY * 1.5,
+                        duration: 1,
+                        ease: "power2.out"
+                    });
+
+                    // Video Movement (Deep Parallax - moves opposite/more)
+                    if (video) {
+                        gsap.to(video, {
+                            x: -normX * strength * 1.5, // Moves opposite
+                            y: -normY * strength * 1.5,
+                            duration: 1.2,
+                            ease: "power2.out"
+                        });
+                    }
+                });
+            }, { passive: true });
+
+            heroCards.addEventListener("mouseleave", () => {
+                if (!scrollAnimComplete) return;
+                allHeroCards.forEach((card) => {
+                    gsap.to(card, { x: 0, y: 0, rotateY: 0, rotateX: 0, duration: 0.8 });
+                    const video = card.querySelector(".card-floating-video");
+                    if (video) gsap.to(video, { x: 0, y: 0, duration: 0.8 });
+                });
+            });
+        }
+    }
 
     document.querySelectorAll(".orb").forEach((orb, index) => {
         const speed = parseFloat(orb.dataset.speed || "1");
@@ -226,6 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ".hero-stage",
         ".hero-cards",
         ".hero-title",
+        ".hero-embed",
         ".hero-subtitle",
         ".hero-rail",
         ".cta-panel",
@@ -355,6 +664,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     gsap.utils.toArray(".cta-panel").forEach((panel) => {
+        if (!panel.querySelector(".sheen")) {
+            const sheen = document.createElement("span");
+            sheen.className = "sheen";
+            sheen.setAttribute("aria-hidden", "true");
+            panel.appendChild(sheen);
+        }
+
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: panel,
@@ -380,6 +696,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 clipPath: "inset(0% 0% 0% 0% round 32px)",
                 ease: "none"
             }, 0);
+        }
+
+        const sheen = panel.querySelector(".sheen");
+        if (sheen) {
+            tl.fromTo(sheen, {
+                x: "-100%",
+                opacity: 0.5
+            }, {
+                x: "200%",
+                opacity: 0,
+                duration: 1,
+                ease: "power2.inOut"
+            }, 0.2);
         }
     });
 
@@ -407,21 +736,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (manifestoText && window.SplitType) {
         const manifestoSplit = new SplitType(manifestoText, { types: "words" });
 
-        gsap.fromTo(manifestoSplit.words, {
-            color: "rgba(243, 246, 255, 0.2)",
-            opacity: 0.35
-        }, {
-            color: "#ffffff",
+        gsap.set(manifestoSplit.words, {
+            opacity: 0.1,
+            filter: "blur(8px)",
+            color: "rgba(243, 246, 255, 0.15)"
+        });
+
+        gsap.to(manifestoSplit.words, {
             opacity: 1,
-            textShadow: "0 0 16px rgba(255, 255, 255, 0.45)",
-            stagger: 0.08,
+            filter: "blur(0px)",
+            color: "#ffffff",
+            textShadow: "0 0 25px rgba(122, 248, 214, 0.4)",
+            stagger: {
+                each: 0.05,
+                from: "center",
+                grid: "auto",
+                ease: "power2.out"
+            },
             scrollTrigger: {
                 trigger: ".manifesto",
                 start: "top 70%",
                 end: "bottom 30%",
-                scrub: true
+                scrub: 1.2
             }
         });
+
     }
 
     const projectsSection = document.querySelector(".projects-section");

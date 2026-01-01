@@ -6,3 +6,13 @@ claude-test.html
 test-api.js
 .mcp.json
 .claude/
+venv/
+*.onnx
+__pycache__/
+*.webm
+!assets/*.webm
+debug_frame*
+revert_ui.py
+finalize_videos.py
+process_videos_*.py
+mnn_model/
