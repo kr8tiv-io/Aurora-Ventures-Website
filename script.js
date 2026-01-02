@@ -848,7 +848,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (projectsSection && projectsTrack) {
         const mm = gsap.matchMedia();
 
-        mm.add("(min-width: 981px)", () => {
+        mm.add("(min-width: 992px)", () => {
             const getScrollDistance = () => Math.max(0, projectsTrack.scrollWidth - projectsSection.clientWidth);
             if (getScrollDistance() <= 0) {
                 return;
@@ -998,7 +998,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     end: "+=400%", // Pin for 400% height (Long scroll duration)
                     pin: true,
                     scrub: 1,      // Smooth reverse/forward
-                    anticipatePin: 1,
                     refreshPriority: 10, // CRITICAL: Calculates layout before the next section
                     invalidateOnRefresh: true
                 }
