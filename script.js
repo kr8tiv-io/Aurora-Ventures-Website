@@ -783,20 +783,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ----------------------------------------------------------------
-    // 2. ETHOS: PINNED "SHRINK & SLIDE" (Fixed Timing)
-    // ----------------------------------------------------------------
-    const mm = gsap.matchMedia();
+    // ================================================================
+    // UNIFIED PINNED ANIMATIONS CONTEXT (Master Controller)
+    // ================================================================
+    // All pinned sections share ONE gsap.matchMedia() context to ensure:
+    // 1. Coordinated lifecycle (all create/destroy together on resize)
+    // 2. Proper refreshPriority ordering (top-to-bottom calculation)
+    // 3. Automatic garbage collection when breakpoint doesn't match
 
-    mm.add("(min-width: 992px)", () => {
+    const masterPinContext = gsap.matchMedia();
+
+    masterPinContext.add("(min-width: 992px)", () => {
+
+        // ----------------------------------------------------------------
+        // ETHOS: PINNED "SHRINK & SLIDE" (Priority: 20 - FIRST)
+        // ----------------------------------------------------------------
         const ethosSection = document.querySelector("#ethos");
         const codeCard = document.querySelector("#code-card");
         const principlesCard = document.querySelector("#principles-card");
 
         if (ethosSection && codeCard && principlesCard) {
-
-            // Set Initial Positions BEFORE the ScrollTrigger starts
-            // Code Card: Big (1.3x) and pushed to the Center (55% right)
+            // Set Initial Positions
             gsap.set(codeCard, {
                 scale: 1.3,
                 xPercent: 55,
@@ -804,7 +811,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 filter: "brightness(1.2)"
             });
 
-            // Principles Card: Hidden off to the right
             gsap.set(principlesCard, {
                 xPercent: 120,
                 opacity: 0,
@@ -812,172 +818,45 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             // The Timeline
-            const tl = gsap.timeline({
+            const ethosTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#ethos",
-                    start: "top top",      // Locks as soon as it hits top
-                    end: "+=300%",         // PINS for 300% (Triple duration = Slower)
+                    start: "top top",
+                    end: "+=300%",
                     pin: true,
                     scrub: 1,
-                    anticipatePin: 1
+                    refreshPriority: 20,        // HIGHEST - Calculates first
+                    invalidateOnRefresh: true,
+                    anticipatePin: 0            // Prevent jitter
                 }
             });
 
             // Phase 1: Shrink & Slide Left
-            tl.to(codeCard, {
+            ethosTl.to(codeCard, {
                 scale: 1,
-                xPercent: 0,           // Returns to left column
+                xPercent: 0,
                 filter: "brightness(1)",
                 duration: 2,
                 ease: "power2.inOut"
             }, "phase1");
 
-            // Phase 2: Slide in Principles (Slightly overlapped)
-            tl.to(principlesCard, {
-                xPercent: 0,           // Slides into right column
+            // Phase 2: Slide in Principles
+            ethosTl.to(principlesCard, {
+                xPercent: 0,
                 opacity: 1,
                 scale: 1,
                 duration: 2,
                 ease: "power2.out"
-            }, "phase1+=0.5");         // Starts 0.5s into the movement
+            }, "phase1+=0.5");
         }
-    });
 
-    const projectsSection = document.querySelector(".projects-section");
-    const projectsTrack = document.querySelector(".projects-track");
-    if (projectsSection && projectsTrack) {
-        const mm = gsap.matchMedia();
-
-        mm.add("(min-width: 992px)", () => {
-            const getScrollDistance = () => Math.max(0, projectsTrack.scrollWidth - projectsSection.clientWidth);
-            if (getScrollDistance() <= 0) {
-                return;
-            }
-
-            gsap.to(projectsTrack, {
-                x: () => -getScrollDistance(),
-                ease: "none",
-                scrollTrigger: {
-                    trigger: projectsSection,
-                    start: "top top",
-                    end: () => `+=${getScrollDistance()}`,
-                    scrub: true,
-                    pin: true,
-                    refreshPriority: 1, // Calculates AFTER Spectrum is done
-                    invalidateOnRefresh: true
-                }
-            });
-        });
-    }
-
-    const founderMedia = document.querySelector(".founder-media");
-    if (founderMedia) {
-        gsap.from(".founder-image", {
-            scale: 1.12,
-            ease: "none",
-            scrollTrigger: {
-                trigger: founderMedia,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-    }
-
-    window.addEventListener("load", () => {
-        ScrollTrigger.refresh();
-    });
-    // Ethos Cube: 2D Spin (Steering Wheel Style) - +/- 30 Degrees
-    // Ethos Cube: 2D Spin (Steering Wheel Style) - +/- 30 Degrees
-    {
-        const codeCard = document.querySelector("#code-card");
-        const cubeVideo = document.querySelector("#ethos-cube-video");
-
-        if (codeCard && cubeVideo) {
-            console.log("Ethos Cube Loaded for Rotation");
-            // Reset any 3D transforms - DO NOT use "all" as it wipes inline styles!
-            gsap.set(cubeVideo, { clearProps: "transform" });
-            gsap.set(cubeVideo, { transformOrigin: "center center" });
-
-            codeCard.addEventListener("mousemove", (e) => {
-                const rect = codeCard.getBoundingClientRect();
-                // Map mouse X to -1 to 1
-                const xPercent = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-
-                // console.log("Rotate:", xPercent * 30); // Debug
-
-                gsap.to(cubeVideo, {
-                    rotation: xPercent * 30,   // 2D ROTATION (30 Deg Limit)
-                    scale: 0.95,               // Shrink 5% on hover
-                    rotationY: 0,              // Kill 3D
-                    rotationX: 0,              // Kill 3D
-                    x: 0,                      // Kill Slide
-                    y: 0,                      // Kill Slide
-                    duration: 0.5,
-                    delay: 0.15,               // Slight delay before rotation starts
-                    ease: "power2.out",
-                    overwrite: "auto"
-                });
-            });
-
-            codeCard.addEventListener("mouseleave", () => {
-                gsap.to(cubeVideo, {
-                    rotation: 0,               // Spin back to upright
-                    scale: 1,                  // Restore size
-                    duration: 1.2,
-                    ease: "elastic.out(1, 0.3)"
-                });
-            });
-        } else {
-            console.warn("Ethos Cube Elements Not Found");
-        }
-    }
-
-    // Partnership Section: 3D Tilt Animation (Scroll-Driven)
-    // Tilts up on entry, flat in view, tilts down on exit
-    {
-        const partnershipPanel = document.querySelector(".partnership-panel");
-
-        if (partnershipPanel) {
-            // Set initial state and enable 3D
-            gsap.set(partnershipPanel, {
-                transformOrigin: "center center",
-                transformPerspective: 1200
-            });
-
-            // Create the scroll-driven tilt animation
-            gsap.timeline({
-                scrollTrigger: {
-                    trigger: partnershipPanel,
-                    start: "top 90%",      // Start when top of panel hits 90% of viewport
-                    end: "bottom 10%",     // End when bottom of panel hits 10% of viewport
-                    scrub: 1.5,            // Buttery smooth scrubbing (1.5s lag)
-                    // markers: true,      // Uncomment for debugging
-                }
-            })
-                .fromTo(partnershipPanel,
-                    { rotateX: 15, y: 50, opacity: 0.7 },     // Entry: Tilted up, pushed down, faded
-                    { rotateX: 0, y: 0, opacity: 1, ease: "power2.out" },  // Middle: Flat and visible
-                    0
-                )
-                .to(partnershipPanel,
-                    { rotateX: -15, y: -50, opacity: 0.7, ease: "power2.in" },  // Exit: Tilted down, pushed up
-                    0.5  // Start at 50% of timeline
-                );
-        }
-    }
-
-    // ----------------------------------------------------------------
-    // 3. SPECTRUM ASSEMBLY (Pinned Scroll) - Desktop Only
-    // ----------------------------------------------------------------
-    // We use the same 'mm' context or create a new one to ensure it handles resizing correctly.
-    const mmSpectrum = gsap.matchMedia();
-
-    mmSpectrum.add("(min-width: 992px)", () => {
+        // ----------------------------------------------------------------
+        // SPECTRUM ASSEMBLY (Priority: 10 - SECOND)
+        // ----------------------------------------------------------------
         const spectrumSec = document.querySelector("#spectrum");
 
         if (spectrumSec) {
-            // 1. SETUP INITIAL STATES (Exploded View)
+            // Initial States (Exploded View)
             gsap.set(".spectrum-header", { y: -150, opacity: 0 });
             gsap.set("#visual-card", { scale: 3, opacity: 0, zIndex: 50 });
             gsap.set("#strategy-card", { x: -800, opacity: 0, rotationY: 45 });
@@ -985,22 +864,22 @@ document.addEventListener("DOMContentLoaded", () => {
             gsap.set("#equity-card", { x: 600, y: 600, opacity: 0 });
             gsap.set("#dev-card", { x: -600, y: 600, opacity: 0 });
 
-            // 2. THE TIMELINE
-            const tl = gsap.timeline({
+            // The Timeline
+            const spectrumTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#spectrum",
                     start: "top top",
                     end: "+=400%",
                     pin: true,
                     scrub: 1,
-                    refreshPriority: 10, // Calculates FIRST
+                    refreshPriority: 10,        // SECOND - After Ethos
                     invalidateOnRefresh: true,
-                    anticipatePin: 0 // Keep 0 to prevent jitter
+                    anticipatePin: 0
                 }
             });
 
             // Step 1: Visual Card "Appears"
-            tl.to("#visual-card", {
+            spectrumTl.to("#visual-card", {
                 scale: 1,
                 opacity: 1,
                 duration: 1.5,
@@ -1038,6 +917,126 @@ document.addEventListener("DOMContentLoaded", () => {
                     ease: "power2.out"
                 }, "-=0.6");
         }
+
+        // ----------------------------------------------------------------
+        // PROJECTS HORIZONTAL SCROLL (Priority: 1 - LAST)
+        // ----------------------------------------------------------------
+        const projectsSection = document.querySelector(".projects-section");
+        const projectsTrack = document.querySelector(".projects-track");
+
+        if (projectsSection && projectsTrack) {
+            const getScrollDistance = () => Math.max(0, projectsTrack.scrollWidth - projectsSection.clientWidth);
+
+            if (getScrollDistance() > 0) {
+                gsap.to(projectsTrack, {
+                    x: () => -getScrollDistance(),
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: projectsSection,
+                        start: "top top",
+                        end: () => `+=${getScrollDistance()}`,
+                        scrub: true,
+                        pin: true,
+                        refreshPriority: 1,         // LAST - After Spectrum
+                        invalidateOnRefresh: true,
+                        anticipatePin: 0
+                    }
+                });
+            }
+        }
+
+        // ----------------------------------------------------------------
+        // PARTNERSHIP TILT (Non-pinned, but needs context for lifecycle)
+        // ----------------------------------------------------------------
+        const partnershipPanel = document.querySelector(".partnership-panel");
+
+        if (partnershipPanel) {
+            gsap.set(partnershipPanel, {
+                transformOrigin: "center center",
+                transformPerspective: 1200
+            });
+
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: partnershipPanel,
+                    start: "top 90%",
+                    end: "bottom 10%",
+                    scrub: 1.5
+                }
+            })
+                .fromTo(partnershipPanel,
+                    { rotateX: 15, y: 50, opacity: 0.7 },
+                    { rotateX: 0, y: 0, opacity: 1, ease: "power2.out" },
+                    0
+                )
+                .to(partnershipPanel,
+                    { rotateX: -15, y: -50, opacity: 0.7, ease: "power2.in" },
+                    0.5
+                );
+        }
+
+    }); // End of masterPinContext
+
+    // ----------------------------------------------------------------
+    // NON-PINNED ANIMATIONS (Outside matchMedia - always active)
+    // ----------------------------------------------------------------
+
+    // Founder Image Parallax
+    const founderMedia = document.querySelector(".founder-media");
+    if (founderMedia) {
+        gsap.from(".founder-image", {
+            scale: 1.12,
+            ease: "none",
+            scrollTrigger: {
+                trigger: founderMedia,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+    }
+
+    // Ethos Cube: 2D Spin (Steering Wheel Style)
+    {
+        const codeCard = document.querySelector("#code-card");
+        const cubeVideo = document.querySelector("#ethos-cube-video");
+
+        if (codeCard && cubeVideo) {
+            gsap.set(cubeVideo, { clearProps: "transform" });
+            gsap.set(cubeVideo, { transformOrigin: "center center" });
+
+            codeCard.addEventListener("mousemove", (e) => {
+                const rect = codeCard.getBoundingClientRect();
+                const xPercent = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+
+                gsap.to(cubeVideo, {
+                    rotation: xPercent * 30,
+                    scale: 0.95,
+                    rotationY: 0,
+                    rotationX: 0,
+                    x: 0,
+                    y: 0,
+                    duration: 0.5,
+                    delay: 0.15,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            });
+
+            codeCard.addEventListener("mouseleave", () => {
+                gsap.to(cubeVideo, {
+                    rotation: 0,
+                    scale: 1,
+                    duration: 1.2,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        }
+    }
+
+    // Final refresh on load
+    window.addEventListener("load", () => {
+        ScrollTrigger.refresh();
     });
 
 });
