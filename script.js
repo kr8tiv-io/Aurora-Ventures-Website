@@ -56,10 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Custom cursor removed
 
-    // Star Streak Spawner (Hero Grid) - Vertical streaks along grid lines
+    // Star Streak Spawner (Hero Grid + Partnership) - Vertical streaks along grid lines
     if (!prefersReducedMotion) {
-        const starLayer = document.querySelector(".grid-star-layer");
-        if (starLayer) {
+        const starLayers = document.querySelectorAll(".grid-star-layer");
+        starLayers.forEach(starLayer => {
             const maxConcurrent = 3;
             let activeStreaks = 0;
 
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, next);
             }
             scheduleHorizontal();
-        }
+        });
     }
 
     // Hero Audio Player
@@ -503,6 +503,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (video) gsap.to(video, { x: 0, y: 0, duration: 0.8 });
                 });
             });
+
+            // Card Video Hover Interaction
+            heroCards.querySelectorAll(".card-floating-video").forEach((wrapper) => {
+                const video = wrapper.querySelector("video");
+                wrapper.addEventListener("mouseenter", () => {
+                    if (video) video.pause();
+                    gsap.to(wrapper, { scale: 1.1, duration: 0.3, ease: "power2.out" });
+                });
+                wrapper.addEventListener("mouseleave", () => {
+                    if (video) video.play();
+                    gsap.to(wrapper, { scale: 1, duration: 0.3, ease: "power2.out" });
+                });
+            });
         }
     }
 
@@ -557,8 +570,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ease: "none"
         }, 0)
         .to(".hero-stage", {
-            y: 60,
-            scale: 0.96,
+            y: 80,
+            scale: 0.95,
+            rotateX: 12,
+            transformOrigin: "50% top",
             ease: "none"
         }, 0)
         .to(".hero-title", {
@@ -733,35 +748,100 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const manifestoText = document.querySelector("#manifesto-text");
+    // ----------------------------------------------------------------
+    // 1. MANIFESTO: CINEMATIC REVEAL (Restored)
+    // ----------------------------------------------------------------
     if (manifestoText && window.SplitType) {
         const manifestoSplit = new SplitType(manifestoText, { types: "words" });
 
+        // Set Initial "Void" State (Blurry, faint teal, pushed down)
         gsap.set(manifestoSplit.words, {
-            opacity: 0.1,
-            filter: "blur(8px)",
-            color: "rgba(243, 246, 255, 0.15)"
+            opacity: 0,
+            filter: "blur(12px)",
+            color: "rgba(122, 248, 214, 0)",
+            y: 20,
+            scale: 0.95
         });
 
+        // Animate to "Ignition" (Sharp, White, Glowing)
         gsap.to(manifestoSplit.words, {
             opacity: 1,
             filter: "blur(0px)",
             color: "#ffffff",
-            textShadow: "0 0 25px rgba(122, 248, 214, 0.4)",
-            stagger: {
-                each: 0.05,
-                from: "center",
-                grid: "auto",
-                ease: "power2.out"
-            },
+            y: 0,
+            scale: 1,
+            textShadow: "0 0 25px rgba(122, 248, 214, 0.7)", // The "Ignition" Glow
+            stagger: 0.08,             // Fast ripple effect
+            duration: 1.2,
+            ease: "power2.out",
             scrollTrigger: {
                 trigger: ".manifesto",
-                start: "top 70%",
-                end: "bottom 30%",
-                scrub: 1.2
+                start: "top 90%",      // STARTS IMMEDIATELY (Bottom of screen)
+                end: "top 45%",        // FINISHES at Center
+                scrub: 1
             }
         });
-
     }
+
+    // ----------------------------------------------------------------
+    // 2. ETHOS: PINNED "SHRINK & SLIDE" (Fixed Timing)
+    // ----------------------------------------------------------------
+    const mm = gsap.matchMedia();
+
+    mm.add("(min-width: 992px)", () => {
+        const ethosSection = document.querySelector("#ethos");
+        const codeCard = document.querySelector("#code-card");
+        const principlesCard = document.querySelector("#principles-card");
+
+        if (ethosSection && codeCard && principlesCard) {
+
+            // Set Initial Positions BEFORE the ScrollTrigger starts
+            // Code Card: Big (1.3x) and pushed to the Center (55% right)
+            gsap.set(codeCard, {
+                scale: 1.3,
+                xPercent: 55,
+                zIndex: 10,
+                filter: "brightness(1.2)"
+            });
+
+            // Principles Card: Hidden off to the right
+            gsap.set(principlesCard, {
+                xPercent: 120,
+                opacity: 0,
+                scale: 0.9
+            });
+
+            // The Timeline
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#ethos",
+                    start: "top top",      // Locks as soon as it hits top
+                    end: "+=300%",         // PINS for 300% (Triple duration = Slower)
+                    pin: true,
+                    scrub: 1,
+                    anticipatePin: 1
+                }
+            });
+
+            // Phase 1: Shrink & Slide Left
+            tl.to(codeCard, {
+                scale: 1,
+                xPercent: 0,           // Returns to left column
+                filter: "brightness(1)",
+                duration: 2,
+                ease: "power2.inOut"
+            }, "phase1");
+
+            // Phase 2: Slide in Principles (Slightly overlapped)
+            tl.to(principlesCard, {
+                xPercent: 0,           // Slides into right column
+                opacity: 1,
+                scale: 1,
+                duration: 2,
+                ease: "power2.out"
+            }, "phase1+=0.5");         // Starts 0.5s into the movement
+        }
+    });
 
     const projectsSection = document.querySelector(".projects-section");
     const projectsTrack = document.querySelector(".projects-track");

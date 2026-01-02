@@ -308,6 +308,8 @@
         .logo-symbol {
             max-height: 28px;
             width: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.7;
         }
 
         .logo-wordmark {
@@ -448,7 +450,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4rem;
+            gap: 16vh;
             perspective: 1200px;
         }
 
@@ -1309,6 +1311,58 @@
             color: var(--c-accent);
         }
 
+        .partner-logo-link {
+            display: inline-block;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease;
+        }
+
+        .partner-logo-link:hover {
+            transform: scale(2);
+            filter: drop-shadow(0 0 15px #7af8d6);
+            z-index: 10;
+        }
+
+        .partner-logo-img {
+            height: 28px;
+            width: auto;
+            display: block;
+            opacity: 0.9;
+        }
+
+        /* Grid Pattern Background */
+        /* Grid Pattern Background */
+        .grid-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 80px 80px;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Traveling Beam for Partnership Panel */
+        .partnership-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25rem;
+            /* Length of the beam tail */
+            height: 100%;
+            /* Default anchor for offset path reference */
+            height: 2px;
+            /* Border thickness */
+            background: linear-gradient(90deg, transparent 0%, var(--c-accent) 50%, #fff 100%);
+            offset-path: rect(0 100% 100% 0 round 32px);
+            animation: border-travel 12s linear infinite;
+            filter: drop-shadow(0 0 5px var(--c-accent));
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
         .manifesto {
             min-height: 80vh;
             display: flex;
@@ -2136,7 +2190,7 @@
             width: 280px;
             height: 280px;
             z-index: 15;
-            pointer-events: none;
+            pointer-events: auto;
             mix-blend-mode: screen;
             opacity: 0.9;
             transition: transform 0.3s ease;
@@ -2381,25 +2435,121 @@
         </section>
 
         <section class="partnership" id="partnership">
-            <div class="glass-card partnership-panel reveal">
+            <div class="glass-card partnership-panel reveal" style="position: relative; overflow: hidden; z-index: 1;">
+
                 <div class="card-bg"
-                    style="background-image: url('assets/vision.png'); opacity: 0.3; background-position: center bottom;">
+                    style="position: absolute; inset: 0; background-image: url('assets/vision.png'); background-position: center bottom; background-size: cover; opacity: 0.05; z-index: 0; pointer-events: none;">
                 </div>
-                <span class="type-label">Kr8tiv Partnership</span>
-                <h2 class="section-title text-glow-fx">
-                    We architect the vision. <span class="partner-accent">Kr8tiv.io</span> engineers the reality.
-                </h2>
-                <p class="section-body">
-                    Built in exclusive partnership. Aurora stewards capital and strategy while Kr8tiv delivers
-                    studio-grade execution.
-                </p>
-                <div class="partner-logos">
-                    <span class="partner-mark">Aurora</span>
-                    <span class="partner-divider">x</span>
-                    <span class="partner-mark partner-accent">Kr8tiv.io</span>
+
+                <div class="grid-pattern"
+                    style="position: absolute; inset: 0; opacity: 0.1; z-index: 1; pointer-events: none; mix-blend-mode: normal; background-image: linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px); background-size: 80px 80px;">
                 </div>
+
+                <div class="grid-star-layer"
+                    style="position: absolute; inset: 0; z-index: 2; opacity: 0.8; pointer-events: none; mix-blend-mode: normal;">
+                </div>
+
+                <div style="position: relative; z-index: 10;">
+                    <span class="type-label">Kr8tiv Partnership</span>
+                    <h2 class="section-title text-glow-fx" style="line-height: 1.2;">
+                        We Architect The Vision.<br>
+                        <span class="partner-accent">Kr8tiv.io</span> Engineers The Reality.
+                    </h2>
+                    <p class="section-body">
+                        Built in exclusive partnership. Aurora stewards capital and strategy<br>
+                        while Kr8tiv delivers studio-grade execution.
+                    </p>
+                    <div class="partner-logos">
+                        <a href="#" class="partner-logo-link"><img src="assets/aurora_wordmark.png" alt="Aurora"
+                                class="partner-logo-img"></a>
+                        <span class="partner-divider">X</span>
+                        <a href="https://kr8tiv.io" target="_blank" class="partner-logo-link"><img
+                                src="assets/kr8tiv-logo.png" alt="Kr8tiv.io" class="partner-logo-img"></a>
+                    </div>
+                </div>
+
             </div>
         </section>
+        <script>
+            (function () {
+                const partnerPanel = document.querySelector(".partnership-panel");
+                if (!partnerPanel) return;
+                const starLayer = partnerPanel.querySelector(".grid-star-layer");
+                if (!starLayer) return;
+
+                // Force layout recalc
+                const _ = starLayer.offsetHeight;
+
+                function spawnStreakExplicit() {
+                    const streak = document.createElement("span");
+                    // Use standard class but force overrides inline if needed, though class 'grid-streak' usually handles animation
+                    // We will manually define animation here to be safe or rely on CSS class if it's reliable.
+                    // Assuming .grid-streak is defined in CSS with keyframes 'streak-vertical'
+                    streak.className = "grid-streak";
+
+                    const gridInterval = 80;
+                    const layerWidth = starLayer.offsetWidth || 800;
+                    const numColumns = Math.floor(layerWidth / gridInterval);
+                    const column = Math.floor(Math.random() * numColumns);
+                    const xPos = column * gridInterval;
+
+                    const len = 120 + Math.random() * 100;
+                    const travel = 300 + Math.random() * 200;
+                    const dur = 2000 + Math.random() * 1500;
+
+                    streak.style.cssText = `
+                position: absolute;
+                width: 2px;
+                background: white;
+                opacity: 0;
+                z-index: 10;
+                left: ${xPos}px;
+                top: -${len}px;
+                --streak-len: ${len}px;
+                --streak-travel: ${travel + len}px;
+                animation: streak-vertical ${dur}ms linear 1;
+            `;
+
+                    starLayer.appendChild(streak);
+
+                    streak.addEventListener("animationend", () => streak.remove());
+                }
+
+                function spawnHorizontalStreakExplicit() {
+                    const streak = document.createElement("span");
+                    streak.className = "grid-streak-h";
+
+                    const gridInterval = 80;
+                    const layerHeight = starLayer.offsetHeight || 400;
+                    const numRows = Math.floor(layerHeight / gridInterval);
+                    const row = Math.floor(Math.random() * numRows);
+                    const yPos = row * gridInterval;
+
+                    const len = 120 + Math.random() * 100;
+                    const travel = 400 + Math.random() * 300;
+                    const dur = 2500 + Math.random() * 2000;
+
+                    streak.style.cssText = `
+                position: absolute;
+                height: 2px;
+                background: white;
+                opacity: 0;
+                z-index: 10;
+                left: -${len}px;
+                top: ${yPos}px;
+                --streak-len: ${len}px;
+                --streak-travel: ${travel + len}px;
+                animation: streak-horizontal ${dur}ms linear 1;
+            `;
+                    starLayer.appendChild(streak);
+                    streak.addEventListener("animationend", () => streak.remove());
+                }
+
+                // Start loops
+                setInterval(spawnStreakExplicit, 1200);
+                setInterval(spawnHorizontalStreakExplicit, 2400);
+            })();
+        </script>
 
         <section class="manifesto" id="manifesto">
             <p class="manifesto-text" id="manifesto-text">
@@ -2409,19 +2559,37 @@
             </p>
         </section>
 
-        <section id="ethos">
-            <div class="section-split">
-                <div class="reveal"
-                    style="padding: 3rem; background: linear-gradient(135deg, rgba(16, 20, 36, 0.85), rgba(10, 14, 28, 0.9)); border: 1px solid var(--c-border-soft);">
+        <section id="ethos"
+            style="min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 1000px;">
+            <div class="ethos-container"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; width: min(1200px, 90vw); position: relative;">
 
-                    <span class="type-label">02 The Ethos</span>
-                    <h2 class="section-title text-glow-fx">Code is liberty.</h2>
-                    <p class="section-body">
-                        The old structures are crumbling. We are the architects of what comes next. From the soil of the
-                        earth to the cloud of the ether, we build the bridges for a sovereign future.
-                    </p>
+                <div id="code-card" class="glass-card"
+                    style="display: flex; flex-direction: column; justify-content: center; z-index: 10; padding: 3.5rem;">
+
+                    <div class="grid-pattern" style="opacity: 0.25; z-index: 0; mix-blend-mode: overlay;"></div>
+
+                    <div class="grid-star-layer" style="opacity: 0.9; z-index: 1;"></div>
+
+                    <div style="position: relative; z-index: 5;">
+                        <span class="type-label">02 The Ethos</span>
+                        <h2 class="section-title text-glow-fx" style="margin-bottom: 1rem;">Code is liberty.</h2>
+
+                        <div class="ethos-video-wrap"
+                            style="position: relative; width: 100%; height: 260px; margin: 1.5rem 0; mix-blend-mode: screen;">
+                            <video src="assets/code_hq.webm" autoplay loop muted playsinline
+                                style="width: 100%; height: 100%; object-fit: contain; opacity: 1;"></video>
+                        </div>
+
+                        <p class="section-body" style="font-size: 1.1rem; max-width: 90%;">
+                            The old structures are crumbling. We are the architects of what comes next. From the soil of
+                            the earth to the cloud of the ether.
+                        </p>
+                    </div>
                 </div>
-                <div class="glass-card reveal">
+
+                <div id="principles-card" class="glass-card"
+                    style="display: flex; flex-direction: column; justify-content: center; opacity: 0; padding: 3.5rem;">
                     <span class="card-label">Principles</span>
                     <h3 class="card-title text-glow-fx">Alignment before allocation.</h3>
                     <ul class="principles">
@@ -2430,6 +2598,7 @@
                         <li>Systems that endure beyond the cycle.</li>
                     </ul>
                 </div>
+
             </div>
         </section>
 
