@@ -162,9 +162,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (audioBtn && heroAudio) {
         audioBtn.addEventListener("click", () => {
             if (heroAudio.paused) {
-                heroAudio.play();
-                audioBtn.classList.add("playing");
-                audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+                const playPromise = heroAudio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        audioBtn.classList.add("playing");
+                        audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+                    }).catch(error => {
+                        console.log("Audio play prevented:", error);
+                    });
+                }
             } else {
                 heroAudio.pause();
                 audioBtn.classList.remove("playing");
