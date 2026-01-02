@@ -863,6 +863,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     end: () => `+=${getScrollDistance()}`,
                     scrub: true,
                     pin: true,
+                    refreshPriority: 1, // Calculates AFTER Spectrum is done
                     invalidateOnRefresh: true
                 }
             });
@@ -997,7 +998,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     end: "+=400%", // Pin for 400% height (Long scroll duration)
                     pin: true,
                     scrub: 1,      // Smooth reverse/forward
-                    anticipatePin: 1
+                    anticipatePin: 1,
+                    refreshPriority: 10, // CRITICAL: Calculates layout before the next section
+                    invalidateOnRefresh: true
                 }
             });
 

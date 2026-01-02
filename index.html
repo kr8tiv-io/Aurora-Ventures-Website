@@ -1445,7 +1445,12 @@
         }
 
         .projects-section {
-            padding: 6vh 0;
+            position: relative;
+            z-index: 10;
+            /* Lower than Spectrum */
+            background-color: #05060c;
+            padding: 10vh 0 6vh 0;
+            /* Safety buffer on top */
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -2674,7 +2679,7 @@
         </section>
 
         <section id="spectrum"
-            style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; perspective: 1000px;">
+            style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; perspective: 1000px; z-index: 20; background-color: #05060c;">
 
             <div class="spectrum-header"
                 style="text-align: center; margin-bottom: 3rem; position: relative; z-index: 20;">
