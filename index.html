@@ -321,6 +321,31 @@
             opacity: 1;
         }
 
+        /* Spectrum Cards - Traveling Beam FX */
+        #strategy-card,
+        #growth-card,
+        #equity-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #strategy-card::before,
+        #growth-card::before,
+        #equity-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+            width: 20rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #7af8d6 50%, #fff 100%);
+            offset-path: rect(0 100% 100% 0 round 26px);
+            animation: border-travel 10s linear infinite;
+            filter: drop-shadow(0 0 8px #7af8d6);
+            opacity: 1;
+        }
+
         .logo {
             display: flex;
             align-items: center;
@@ -2704,6 +2729,11 @@
                 </div>
 
                 <div id="visual-card" class="service-card reveal" style="z-index: 10;">
+                    <div class="grid-pattern"
+                        style="position: absolute; inset: 0; opacity: 0.15; z-index: 1; pointer-events: none; mix-blend-mode: overlay; background-image: linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px); background-size: 80px 80px;">
+                    </div>
+                    <div class="grid-star-layer"
+                        style="position: absolute; inset: 0; z-index: 2; opacity: 0.8; pointer-events: none;"></div>
                     <span class="card-label">Creative & Experience</span>
                     <h3 class="service-title text-glow-fx">Visual & Design</h3>
                     <ul class="service-list">
@@ -2724,6 +2754,11 @@
                 </div>
 
                 <div id="dev-card" class="service-card reveal">
+                    <div class="grid-pattern"
+                        style="position: absolute; inset: 0; opacity: 0.15; z-index: 1; pointer-events: none; mix-blend-mode: overlay; background-image: linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px); background-size: 80px 80px;">
+                    </div>
+                    <div class="grid-star-layer"
+                        style="position: absolute; inset: 0; z-index: 2; opacity: 0.8; pointer-events: none;"></div>
                     <span class="card-label">Engineering & Tech</span>
                     <h3 class="service-title text-glow-fx">Dev & Automation</h3>
                     <ul class="service-list">
@@ -2744,7 +2779,8 @@
         </section>
 
         <!-- Buffer Zone: Separates Spectrum and Projects pinned animations -->
-        <div class="section-buffer" style="height: 20vh; background-color: transparent; position: relative; z-index: 15;">
+        <div class="section-buffer"
+            style="height: 20vh; background-color: transparent; position: relative; z-index: 15;">
         </div>
 
         <section class="projects-section" id="projects">

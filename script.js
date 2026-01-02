@@ -851,20 +851,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // ----------------------------------------------------------------
-        // SPECTRUM ASSEMBLY (Priority: 10 - SECOND)
+        // SPECTRUM ASSEMBLY (Inverted Zoom - Priority: 10)
         // ----------------------------------------------------------------
         const spectrumSec = document.querySelector("#spectrum");
 
         if (spectrumSec) {
-            // Initial States (Exploded View)
-            gsap.set(".spectrum-header", { y: -150, opacity: 0 });
-            gsap.set("#visual-card", { scale: 3, opacity: 0, zIndex: 50 });
-            gsap.set("#strategy-card", { x: -800, opacity: 0, rotationY: 45 });
-            gsap.set("#growth-card", { x: 800, opacity: 0, rotationY: -45 });
-            gsap.set("#equity-card", { x: 600, y: 600, opacity: 0 });
-            gsap.set("#dev-card", { x: -600, y: 600, opacity: 0 });
+            // 1. SETUP INITIAL STATES
 
-            // The Timeline
+            // Visual Card: Starts TINY and FAR AWAY
+            gsap.set("#visual-card", {
+                scale: 0.2,
+                opacity: 0,
+                z: -1000,
+                zIndex: 50
+            });
+
+            // Header: Hidden above
+            gsap.set(".spectrum-header", { y: -200, opacity: 0 });
+
+            // Sides: Push them WAY off-screen (120vw ensures they are gone)
+            gsap.set("#strategy-card", { x: "-120vw", opacity: 0, rotationY: 45 });
+            gsap.set("#growth-card", { x: "120vw", opacity: 0, rotationY: -45 });
+
+            // Bottoms: Push them WAY down and out
+            gsap.set("#equity-card", { x: "100vw", y: "100vh", opacity: 0 });
+            gsap.set("#dev-card", { x: "-100vw", y: "100vh", opacity: 0 });
+
+            // 2. THE TIMELINE
             const spectrumTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#spectrum",
@@ -872,26 +885,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     end: "+=400%",
                     pin: true,
                     scrub: 1,
-                    refreshPriority: 10,        // SECOND - After Ethos
+                    refreshPriority: 10,
                     invalidateOnRefresh: true,
                     anticipatePin: 0
                 }
             });
 
-            // Step 1: Visual Card "Appears"
+            // Step 1: Visual Card Zooms In (Tiny -> Normal)
             spectrumTl.to("#visual-card", {
                 scale: 1,
                 opacity: 1,
-                duration: 1.5,
-                ease: "power2.inOut"
+                z: 0,
+                duration: 2,
+                ease: "power2.out"
             })
-                // Step 2: Wings Enter
+                // Step 2: Wings Enter (Strategy & Growth)
                 .to(["#strategy-card", "#growth-card"], {
                     x: 0,
                     opacity: 1,
                     rotationY: 0,
-                    duration: 1,
-                    ease: "back.out(0.8)"
+                    duration: 1.2,
+                    ease: "power2.out"
                 }, "-=0.5")
                 // Step 3: Header Drops In
                 .to(".spectrum-header", {
@@ -899,7 +913,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     opacity: 1,
                     duration: 0.8,
                     ease: "power2.out"
-                }, "-=0.5")
+                }, "-=0.8")
                 // Step 4: Equity Enters
                 .to("#equity-card", {
                     x: 0,
@@ -907,7 +921,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     opacity: 1,
                     duration: 1,
                     ease: "power2.out"
-                })
+                }, "-=0.2")
                 // Step 5: Dev Enters
                 .to("#dev-card", {
                     x: 0,
@@ -915,7 +929,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     opacity: 1,
                     duration: 1,
                     ease: "power2.out"
-                }, "-=0.6");
+                }, "-=0.8");
         }
 
         // ----------------------------------------------------------------
