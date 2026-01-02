@@ -296,6 +296,31 @@
             }
         }
 
+        /* Principles Card - Traveling Star Border */
+        #principles-card {
+            position: relative;
+        }
+
+        #principles-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+
+            /* The Beam Tail & Color */
+            width: 20rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #7af8d6 50%, #fff 100%);
+
+            /* The Motion Path (Adapted for Card Radius of 26px) */
+            offset-path: rect(0 100% 100% 0 round 26px);
+            animation: border-travel 10s linear infinite;
+
+            filter: drop-shadow(0 0 8px #7af8d6);
+            opacity: 1;
+        }
+
         .logo {
             display: flex;
             align-items: center;
@@ -764,6 +789,44 @@
 
         .hero-webgl canvas {
             background: transparent !important;
+        }
+
+        /* Hero WebGL - Traveling Star Border on Hover */
+        .hero-webgl::before {
+            content: "" !important;
+            display: block !important;
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            pointer-events: none;
+
+            /* The Beam Tail & Color (Matches Hero Section) */
+            width: 20rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #7af8d6 50%, #fff 100%);
+
+            /* The Motion Path (17px radius from .hero-webgl) */
+            offset-path: rect(0 100% 100% 0 round 17px);
+            animation: border-travel 8s linear infinite;
+
+            filter: drop-shadow(0 0 8px #7af8d6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .hero-webgl:hover::before {
+            opacity: 1;
+        }
+
+        /* Hero WebGL - Solid Border on Hover (matches hero-stage) */
+        .hero-webgl {
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-webgl:hover {
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 0 20px rgba(122, 248, 214, 0.15);
         }
 
         /* Prevent .hero-stage backdrop-filter from affecting canvas */
@@ -1284,6 +1347,9 @@
             width: min(1000px, 90vw);
             margin: 0 auto;
             padding: 3.6rem 4rem;
+            transform-style: preserve-3d;
+            will-change: transform, opacity;
+            perspective: 1200px;
         }
 
         .partner-logos {
@@ -2567,18 +2633,24 @@
                 <div id="code-card" class="glass-card"
                     style="display: flex; flex-direction: column; justify-content: center; z-index: 10; padding: 3.5rem;">
 
-                    <div class="grid-pattern" style="opacity: 0.25; z-index: 0; mix-blend-mode: overlay;"></div>
+                    <div class="grid-pattern" style="position: absolute; inset: 0; opacity: 0.08; z-index: 1; pointer-events: none; mix-blend-mode: overlay;
+                        background-image: linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+                        background-size: 80px 80px;">
+                    </div>
 
-                    <div class="grid-star-layer" style="opacity: 0.9; z-index: 1;"></div>
+                    <div class="grid-star-layer"
+                        style="position: absolute; inset: 0; z-index: 2; opacity: 0.8; pointer-events: none;"></div>
 
                     <div style="position: relative; z-index: 5; padding: 0 1rem;">
                         <span class="type-label">02 The Ethos</span>
-                        <h2 class="section-title text-glow-fx" style="margin-bottom: 0;">Code is liberty.</h2>
+                        <h2 class="section-title text-glow-fx"
+                            style="margin-bottom: 0; position: relative; z-index: 20;">Code is liberty.</h2>
 
                         <div class="ethos-video-wrap"
-                            style="position: relative; width: 100%; height: 260px; margin: -20px 0;">
-                            <video src="assets/code.mp4" autoplay loop muted playsinline
-                                style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: screen;"></video>
+                            style="position: relative; width: 100%; height: 180px; max-height: 180px; margin: -10px 0; z-index: 1; background: transparent; overflow: visible; pointer-events: none;">
+                            <video id="ethos-cube-video" src="assets/code_solid.webm" autoplay loop muted playsinline
+                                style="width: 100%; height: 100%; object-fit: contain; opacity: 1; will-change: transform; pointer-events: none;"></video>
                         </div>
 
                         <p class="section-body" style="margin-top: 0;">

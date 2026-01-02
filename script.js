@@ -886,4 +886,84 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", () => {
         ScrollTrigger.refresh();
     });
+    // Ethos Cube: 2D Spin (Steering Wheel Style) - +/- 30 Degrees
+    // Ethos Cube: 2D Spin (Steering Wheel Style) - +/- 30 Degrees
+    {
+        const codeCard = document.querySelector("#code-card");
+        const cubeVideo = document.querySelector("#ethos-cube-video");
+
+        if (codeCard && cubeVideo) {
+            console.log("Ethos Cube Loaded for Rotation");
+            // Reset any 3D transforms - DO NOT use "all" as it wipes inline styles!
+            gsap.set(cubeVideo, { clearProps: "transform" });
+            gsap.set(cubeVideo, { transformOrigin: "center center" });
+
+            codeCard.addEventListener("mousemove", (e) => {
+                const rect = codeCard.getBoundingClientRect();
+                // Map mouse X to -1 to 1
+                const xPercent = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+
+                // console.log("Rotate:", xPercent * 30); // Debug
+
+                gsap.to(cubeVideo, {
+                    rotation: xPercent * 30,   // 2D ROTATION (30 Deg Limit)
+                    scale: 0.95,               // Shrink 5% on hover
+                    rotationY: 0,              // Kill 3D
+                    rotationX: 0,              // Kill 3D
+                    x: 0,                      // Kill Slide
+                    y: 0,                      // Kill Slide
+                    duration: 0.5,
+                    delay: 0.15,               // Slight delay before rotation starts
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            });
+
+            codeCard.addEventListener("mouseleave", () => {
+                gsap.to(cubeVideo, {
+                    rotation: 0,               // Spin back to upright
+                    scale: 1,                  // Restore size
+                    duration: 1.2,
+                    ease: "elastic.out(1, 0.3)"
+                });
+            });
+        } else {
+            console.warn("Ethos Cube Elements Not Found");
+        }
+    }
+
+    // Partnership Section: 3D Tilt Animation (Scroll-Driven)
+    // Tilts up on entry, flat in view, tilts down on exit
+    {
+        const partnershipPanel = document.querySelector(".partnership-panel");
+
+        if (partnershipPanel) {
+            // Set initial state and enable 3D
+            gsap.set(partnershipPanel, {
+                transformOrigin: "center center",
+                transformPerspective: 1200
+            });
+
+            // Create the scroll-driven tilt animation
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: partnershipPanel,
+                    start: "top 90%",      // Start when top of panel hits 90% of viewport
+                    end: "bottom 10%",     // End when bottom of panel hits 10% of viewport
+                    scrub: 1.5,            // Buttery smooth scrubbing (1.5s lag)
+                    // markers: true,      // Uncomment for debugging
+                }
+            })
+                .fromTo(partnershipPanel,
+                    { rotateX: 15, y: 50, opacity: 0.7 },     // Entry: Tilted up, pushed down, faded
+                    { rotateX: 0, y: 0, opacity: 1, ease: "power2.out" },  // Middle: Flat and visible
+                    0
+                )
+                .to(partnershipPanel,
+                    { rotateX: -15, y: -50, opacity: 0.7, ease: "power2.in" },  // Exit: Tilted down, pushed up
+                    0.5  // Start at 50% of timeline
+                );
+        }
+    }
+
 });
