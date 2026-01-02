@@ -966,4 +966,84 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // SPECTRUM ASSEMBLY (Pinned Scroll) - Desktop Only
+    if (window.matchMedia("(min-width: 992px)").matches) {
+        const spectrumSec = document.querySelector("#spectrum");
+        if (spectrumSec) {
+            // 1. SETUP INITIAL STATES (Exploded View)
+            // Header: Hidden above
+            gsap.set(".spectrum-header", { y: -150, opacity: 0 });
+
+            // Visual Card: Starts HUGE and CENTERED (Simulating background)
+            gsap.set("#visual-card", { scale: 3, opacity: 0, zIndex: 50 });
+
+            // Strategy (Left): Off-screen Left
+            gsap.set("#strategy-card", { x: -800, opacity: 0, rotationY: 45 });
+
+            // Growth (Right): Off-screen Right
+            gsap.set("#growth-card", { x: 800, opacity: 0, rotationY: -45 });
+
+            // Equity (Bottom Right): Off-screen Bottom Right
+            gsap.set("#equity-card", { x: 600, y: 600, opacity: 0 });
+
+            // Dev (Bottom Left): Off-screen Bottom Left
+            gsap.set("#dev-card", { x: -600, y: 600, opacity: 0 });
+
+            // 2. THE TIMELINE
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#spectrum",
+                    start: "top top",
+                    end: "+=400%", // Pin for 400% height (Long scroll duration)
+                    pin: true,
+                    scrub: 1,      // Smooth reverse/forward
+                    anticipatePin: 1
+                }
+            });
+
+            // Step 1: Visual Card "Appears" from background (Huge -> Normal)
+            tl.to("#visual-card", {
+                scale: 1,
+                opacity: 1,
+                duration: 1.5,
+                ease: "power2.inOut"
+            })
+
+                // Step 2: Wings Enter (Strategy & Growth)
+                .to(["#strategy-card", "#growth-card"], {
+                    x: 0,
+                    opacity: 1,
+                    rotationY: 0,
+                    duration: 1,
+                    ease: "back.out(0.8)"
+                }, "-=0.5") // Overlap slightly
+
+                // Step 3: Header Drops In
+                .to(".spectrum-header", {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: "power2.out"
+                }, "-=0.5")
+
+                // Step 4: Equity Enters (Bottom Right)
+                .to("#equity-card", {
+                    x: 0,
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power2.out"
+                })
+
+                // Step 5: Dev Enters (Bottom Left) - Finishes the assembly
+                .to("#dev-card", {
+                    x: 0,
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power2.out"
+                }, "-=0.6");
+        }
+    }
+
 });

@@ -818,17 +818,14 @@
             opacity: 1;
         }
 
-        /* Hero WebGL - Solid Border on Hover (matches hero-stage) */
+        /* Hero WebGL - No Border */
         .hero-webgl {
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: none;
             border-radius: 17px;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .hero-webgl:hover {
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 17px;
-            box-shadow: 0 0 20px rgba(122, 248, 214, 0.15);
+            border: none;
         }
 
         /* Prevent .hero-stage backdrop-filter from affecting canvas */
@@ -2676,77 +2673,66 @@
             </div>
         </section>
 
-        <section id="spectrum">
-            <span class="type-label">03 The Spectrum</span>
-            <h2 class="section-title text-glow-fx">Complete Studio Services.</h2>
-            <p class="section-body" style="max-width: 600px;">
-                Everything we discussed. From high-end web design to viral memes, we provide the full stack of creative
-                and strategic assets.
-            </p>
+        <section id="spectrum"
+            style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; perspective: 1000px;">
 
-            <div class="services-grid">
-                <div class="service-card reveal">
+            <div class="spectrum-header"
+                style="text-align: center; margin-bottom: 3rem; position: relative; z-index: 20;">
+                <span class="type-label">03 The Spectrum</span>
+                <h2 class="section-title text-glow-fx">Complete Studio Services.</h2>
+                <p class="section-body" style="max-width: 600px; margin: 0 auto;">
+                    Everything we discussed. From high-end web design to viral memes, we provide the full stack.
+                </p>
+            </div>
 
+            <div class="services-grid"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; width: min(1200px, 90vw); margin: 0 auto; position: relative;">
+
+                <div id="strategy-card" class="service-card reveal">
                     <span class="card-label">Strategy & Architecture</span>
                     <h3 class="service-title text-glow-fx">Advisory & Legal</h3>
                     <ul class="service-list">
                         <li>Consulting & Advisory</li>
                         <li>RWA, DAO & Legal Formations</li>
                         <li>Token Advisory & Economic Models</li>
-                        <li>White Paper & Technical Doc Planning</li>
-                        <li>Copywriting & Copywriting Advisory</li>
                     </ul>
                 </div>
 
-                <div class="service-card reveal">
-
+                <div id="visual-card" class="service-card reveal" style="z-index: 10;">
                     <span class="card-label">Creative & Experience</span>
                     <h3 class="service-title text-glow-fx">Visual & Design</h3>
                     <ul class="service-list">
-                        <li>Logos, Branding, Asset Mgmt & Story</li>
+                        <li>Logos, Branding, Asset Mgmt</li>
                         <li>UX & UI Design</li>
-                        <li>DeFi, Fintech, 3D & Experimental Webs</li>
-                        <li>Animated Videos & Shorts</li>
-                        <li>Physical Assets & Merch Planning</li>
+                        <li>DeFi, Fintech, 3D Webs</li>
                     </ul>
                 </div>
 
-                <div class="service-card reveal">
-
+                <div id="growth-card" class="service-card reveal">
                     <span class="card-label">Media & Signal</span>
                     <h3 class="service-title text-glow-fx">Growth & Content</h3>
                     <ul class="service-list">
                         <li>Video Editing & Creation</li>
-                        <li>Social Media Management & Planning</li>
-                        <li>Interviews, Podcasts, Spaces Hosting</li>
-                        <li>Ads & User Acquisition Planning</li>
-                        <li>Community Building & Campaign Creation</li>
+                        <li>Social Media Management</li>
+                        <li>Ads & User Acquisition</li>
                     </ul>
                 </div>
 
-                <div class="service-card reveal">
-
+                <div id="dev-card" class="service-card reveal">
                     <span class="card-label">Engineering & Tech</span>
                     <h3 class="service-title text-glow-fx">Dev & Automation</h3>
                     <ul class="service-list">
                         <li>Blockchain Development</li>
                         <li>NFT Creation & Deployment</li>
-                        <li>Website Design, Hosting & Infra</li>
-                        <li>Marketing Automation</li>
+                        <li>Website Design & Infra</li>
                     </ul>
                 </div>
 
-                <div class="service-card reveal" style="border-color: var(--c-accent); grid-column: span 2;">
-
-                    <span class="card-label" style="color: var(--c-accent);">The Hybrid Model</span>
+                <div id="equity-card" class="service-card reveal" style="border-color: #7af8d6; grid-column: span 2;">
+                    <span class="card-label" style="color: #7af8d6;">The Hybrid Model</span>
                     <h3 class="service-title text-glow-fx">Services for Equity</h3>
                     <p class="service-body">
-                        We don't just bill; we build. For projects that meet our strict criteria, we offer full-service
-                        packages (Web, Design, Strategy) in exchange for <strong>Token Allocations</strong> or
-                        <strong>Equity</strong>.
-                    </p>
-                    <p class="service-body" style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.7;">
-                        *Selection rate is low. Approval required.
+                        We don't just bill; we build. Full-service packages in exchange for Token Allocations.
                     </p>
                 </div>
             </div>
