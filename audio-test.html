@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+    <style>
+        body {
+            background: #111;
+            color: white;
+            font-family: sans-serif;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #7af8d6;
+            border: none;
+            border-radius: 8px;
+            color: #111;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #5dd9b9;
+        }
+
+        #status {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #7af8d6;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Audio Player Test</h1>
+    <div id="status">Click the button to test audio</div>
+    <button id="playBtn">Play Audio</button>
+    <button id="pauseBtn">Pause Audio</button>
+
+    <audio id="testAudio" src="assets/nothing-stays-the-same-410987.mp3" preload="metadata" loop></audio>
+
+    <div id="console"
+        style="margin-top: 30px; max-width: 600px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+    </div>
+
+    <script>
+        const audio = document.getElementById('testAudio');
+        const status = document.getElementById('status');
+        const consoleDiv = document.getElementById('console');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+
+        function log(message, isError = false) {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.textContent = `[${time}] ${message}`;
+            entry.style.color = isError ? '#ff6b6b' : '#7af8d6';
+            entry.style.marginBottom = '5px';
+            consoleDiv.insertBefore(entry, consoleDiv.firstChild);
+            console.log(message);
+        }
+
+        // Audio event listeners
+        audio.addEventListener('loadstart', () => log('Audio loading started...'));
+        audio.addEventListener('loadedmetadata', () => log('Audio metadata loaded'));
+        audio.addEventListener('canplay', () => log('Audio can play'));
+        audio.addEventListener('canplaythrough', () => log('Audio can play through'));
+        audio.addEventListener('playing', () => {
+            log('Audio is now playing!');
+            status.textContent = '🎵 Audio Playing';
+            status.className = 'success';
+        });
+        audio.addEventListener('pause', () => {
+            log('Audio paused');
+            status.textContent = '⏸ Audio Paused';
+            status.className = '';
+        });
+        audio.addEventListener('error', (e) => {
+            log(`Audio error: ${audio.error?.message || 'Unknown error'} (Code: ${audio.error?.code})`, true);
+            status.textContent = '❌ Audio Error';
+            status.className = 'error';
+        });
+        audio.addEventListener('ended', () => log('Audio ended'));
+
+        // Play button
+        playBtn.addEventListener('click', async () => {
+            log('Play button clicked');
+            try {
+                await audio.play();
+                log('Play successful!');
+            } catch (error) {
+                log(`Play failed: ${error.name} - ${error.message}`, true);
+                status.textContent = `Error: ${error.message}`;
+                status.className = 'error';
+            }
+        });
+
+        // Pause button
+        pauseBtn.addEventListener('click', () => {
+            log('Pause button clicked');
+            audio.pause();
+        });
+
+        // Initial info
+        log('Audio test initialized');
+        log(`Audio source: ${audio.src}`);
+        log(`Audio ready state: ${audio.readyState}`);
+        log(`Audio network state: ${audio.networkState}`);
+    </script>
+</body>
+
+</html>

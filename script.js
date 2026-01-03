@@ -156,29 +156,73 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Hero Audio Player
+    // Hero Audio Player - Enhanced with debugging and better UX
     const audioBtn = document.getElementById("heroAudioBtn");
     const heroAudio = document.getElementById("heroAudio");
+
     if (audioBtn && heroAudio) {
-        audioBtn.addEventListener("click", () => {
+        console.log("Audio player initialized");
+        console.log("Audio button element:", audioBtn);
+        console.log("Audio src:", heroAudio.src);
+
+        // Set initial volume
+        heroAudio.volume = 0.6;
+
+        // Error handler
+        heroAudio.addEventListener("error", (e) => {
+            console.error("Audio error:", e);
+            console.error("Audio error code:", heroAudio.error?.code);
+        });
+
+        // Loading state handlers
+        heroAudio.addEventListener("canplay", () => {
+            console.log("Audio can play");
+        });
+
+        heroAudio.addEventListener("canplaythrough", () => {
+            console.log("Audio can play through");
+        });
+
+        // Toggle audio function
+        const toggleAudio = () => {
+            console.log("Toggle audio called");
+
             if (heroAudio.paused) {
-                const playPromise = heroAudio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
+                console.log("Attempting to play...");
+                heroAudio.play()
+                    .then(() => {
+                        console.log("Playing!");
                         audioBtn.classList.add("playing");
                         audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
-                    }).catch(error => {
-                        console.log("Audio play prevented:", error);
+                    })
+                    .catch(err => {
+                        console.error("Play error:", err);
+                        audioBtn.style.borderColor = "red";
+                        setTimeout(() => audioBtn.style.borderColor = "", 1000);
                     });
-                }
             } else {
+                console.log("Pausing...");
                 heroAudio.pause();
                 audioBtn.classList.remove("playing");
                 audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>';
             }
+        };
+
+        // Add both click and pointerdown for maximum compatibility
+        audioBtn.addEventListener("click", (e) => {
+            console.log("Click event fired");
+            e.stopPropagation();
+            toggleAudio();
         });
 
+        audioBtn.addEventListener("pointerdown", (e) => {
+            console.log("Pointerdown event fired");
+            e.stopPropagation();
+        });
+
+        // Reset on end
         heroAudio.addEventListener("ended", () => {
+            console.log("Audio ended");
             audioBtn.classList.remove("playing");
             audioBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>';
         });
@@ -753,39 +797,61 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // ----------------------------------------------------------------
+    // MANIFESTO: SCROLL-READ HIGHLIGHT & HOVER GLOW
+    // ----------------------------------------------------------------
     const manifestoText = document.querySelector("#manifesto-text");
-    // ----------------------------------------------------------------
-    // 1. MANIFESTO: CINEMATIC REVEAL (Restored)
-    // ----------------------------------------------------------------
     if (manifestoText && window.SplitType) {
-        const manifestoSplit = new SplitType(manifestoText, { types: "words" });
+        // 1. Split text into words
+        const text = new SplitType(manifestoText, { types: "words" });
 
-        // Set Initial "Void" State (Blurry, faint teal, pushed down)
-        gsap.set(manifestoSplit.words, {
-            opacity: 0,
-            filter: "blur(12px)",
-            color: "rgba(122, 248, 214, 0)",
-            y: 20,
-            scale: 0.95
+        // 2. Set Initial State (Dimmed / Gray)
+        gsap.set(text.words, {
+            opacity: 0.25,
+            color: "#8892b0", // Tech Gray
+            willChange: "opacity, color"
         });
 
-        // Animate to "Ignition" (Sharp, White, Glowing)
-        gsap.to(manifestoSplit.words, {
+        // 3. The Scroll "Highlight" Animation
+        gsap.to(text.words, {
             opacity: 1,
-            filter: "blur(0px)",
-            color: "#ffffff",
-            y: 0,
-            scale: 1,
-            textShadow: "0 0 25px rgba(122, 248, 214, 0.7)", // The "Ignition" Glow
-            stagger: 0.08,             // Fast ripple effect
-            duration: 1.2,
-            ease: "power2.out",
+            color: "#ffffff", // Active White
+            duration: 1,
+            stagger: 1,       // Stagger linked to scrub makes it sequential
+            ease: "none",     // Linear fill
             scrollTrigger: {
-                trigger: ".manifesto",
-                start: "top 90%",      // STARTS IMMEDIATELY (Bottom of screen)
-                end: "top 45%",        // FINISHES at Center
-                scrub: 1
+                trigger: "#manifesto",
+                start: "top 60%",     // Starts reading when section hits middle
+                end: "bottom 60%",    // Finishes reading when bottom hits middle
+                scrub: 0.5            // Smooth linkage to scrollbar
             }
+        });
+
+        // 4. Mouse Over Effect (Subtle Glow per Word)
+        text.words.forEach(word => {
+            word.style.transition = "text-shadow 0.3s, transform 0.3s"; // CSS transition for hover is smoother here
+
+            word.addEventListener("mouseenter", () => {
+                // Force White + Teal Glow + Slight Bump
+                gsap.to(word, {
+                    color: "#ffffff",
+                    opacity: 1,
+                    textShadow: "0 0 15px rgba(122, 248, 214, 0.8)", // Teal Glow
+                    scale: 1.1,
+                    duration: 0.1,
+                    overwrite: "auto"
+                });
+            });
+
+            word.addEventListener("mouseleave", () => {
+                // Remove Glow/Scale, but let ScrollTrigger reclaim control of Color/Opacity
+                gsap.to(word, {
+                    textShadow: "none",
+                    scale: 1,
+                    duration: 0.3,
+                    clearProps: "textShadow,scale" // Important: Don't clear color/opacity, let ScrollTrigger handle that
+                });
+            });
         });
     }
 
@@ -864,11 +930,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (spectrumSec) {
             // 1. SETUP INITIAL STATES
 
-            // Visual Card: Starts TINY and FAR AWAY
+            // Visual Card: Starts closer (60% size instead of 20%)
             gsap.set("#visual-card", {
-                scale: 0.2,
+                scale: 0.6,    // Was 0.2
                 opacity: 0,
-                z: -1000,
+                z: -400,       // Was -1000 (Pulling it closer)
                 zIndex: 50
             });
 

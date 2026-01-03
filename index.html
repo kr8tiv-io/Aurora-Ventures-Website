@@ -21,6 +21,33 @@
 
     <style>
         /* ===========================================
+           FONT FACES
+           =========================================== */
+        @font-face {
+            font-family: 'Neue Machina';
+            src: url('./assets/NeueMachina-Light.otf') format('opentype');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Neue Machina';
+            src: url('./assets/NeueMachina-Regular.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Neue Machina';
+            src: url('./assets/NeueMachina-Ultrabold.otf') format('opentype');
+            font-weight: 800;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ===========================================
            ORIGINAL BASELINE STYLES (PRESERVED)
            =========================================== */
         :root {
@@ -34,7 +61,7 @@
             --c-border: rgba(255, 255, 255, 0.2);
             --c-border-soft: rgba(255, 255, 255, 0.12);
 
-            --f-head: "Chakra Petch", sans-serif;
+            --f-head: "Neue Machina", sans-serif;
             --f-body: "Space Grotesk", sans-serif;
 
             --ease-power: cubic-bezier(0.22, 1, 0.36, 1);
@@ -722,6 +749,8 @@
             letter-spacing: 0.28em;
             font-size: 0.62rem;
             color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            z-index: 50;
         }
 
         .hero-tag {
@@ -957,12 +986,29 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-left: 0.5rem;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            animation: audio-btn-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes audio-btn-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(122, 248, 214, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(122, 248, 214, 0);
+            }
         }
 
         .hero-audio-btn:hover {
             background: rgba(122, 248, 214, 0.15);
             border-color: var(--c-accent);
             transform: scale(1.1);
+            animation: none;
         }
 
         .hero-audio-btn svg {
@@ -970,10 +1016,31 @@
             height: 14px;
             fill: currentColor;
             color: rgba(255, 255, 255, 0.8);
+            transition: color 0.3s ease;
+        }
+
+        .hero-audio-btn.playing {
+            background: rgba(122, 248, 214, 0.12);
+            border-color: var(--c-accent);
+            animation: audio-playing-pulse 2s ease-in-out infinite;
         }
 
         .hero-audio-btn.playing svg {
             color: var(--c-accent);
+        }
+
+        @keyframes audio-playing-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(122, 248, 214, 0.6),
+                    0 0 15px rgba(122, 248, 214, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(122, 248, 214, 0),
+                    0 0 20px rgba(122, 248, 214, 0.5);
+            }
         }
 
         .hero-subtitle {
@@ -2468,7 +2535,8 @@
                             <polygon points="5,3 19,12 5,21" />
                         </svg>
                     </button>
-                    <audio id="heroAudio" src="assets/nothing-stays-the-same-410987.mp3" preload="none"></audio>
+                    <audio id="heroAudio" src="assets/nothing-stays-the-same-410987.mp3" preload="metadata"
+                        loop></audio>
                 </div>
                 <h1 class="hero-title" aria-label="Aurora Ventures">
                     <div class="hero-webgl" data-us-project="tkOC2fdxK3BsgnJowsRV"
@@ -2662,9 +2730,9 @@
                 <div id="code-card" class="glass-card"
                     style="display: flex; flex-direction: column; justify-content: center; z-index: 10; padding: 3.5rem;">
 
-                    <div class="grid-pattern" style="position: absolute; inset: 0; opacity: 0.3; z-index: 1; pointer-events: none; mix-blend-mode: overlay;
-                        background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px);
-                        background-size: 20px 20px;">
+                    <div class="grid-pattern" style="position: absolute; inset: 0; opacity: 0.35; z-index: 0; pointer-events: none; mix-blend-mode: normal;
+                        background-image: radial-gradient(rgba(255, 255, 255, 0.4) 0.5px, transparent 1px);
+                        background-size: 3px 3px;">
                     </div>
 
                     <div class="grid-star-layer"
@@ -2863,9 +2931,8 @@
         </section>
 
         <section class="founder" id="founder">
-            <div class="founder-media reveal" style="flex: 0 0 auto; margin-right: 2rem;">
-                <img class="founder-image" src="assets/matt_small.png" alt="Matt Haynes Portrait"
-                    style="width: 140px; height: 200px; border-radius: 12px; box-shadow: 0 0 20px rgba(122, 248, 214, 0.2);">
+            <div class="founder-media reveal">
+                <img class="founder-image" src="assets/matt_architect.png" alt="Matt Haynes Portrait">
             </div>
             <div class="founder-content reveal">
                 <span class="type-label founder-role">The Architect</span>

@@ -11,23 +11,27 @@ A high-fidelity, immersive portfolio website for Aurora Ventures, a blockchain v
 
 ### Key Animations
 - **Hero Section**:
-  - **3D Kinetic Tilt**: The main "stage" tilts backward (`rotateX`) as you scroll, creating depth.
-  - **Video Holograms**: Background-less videos (processed via U2Net) float above the cards.
+  - **3D Kinetic Tilt**: The main stage tilts based on scroll position, emphasizing depth.
+  - **Ambient Audio**: A robust audio player engine with pulsing HUD feedback and intelligent error handling.
 - **Manifesto**:
-  - **Cinematic Reveal**: Text ignites from a blurry "void" state to crisp white heat as it enters the viewport.
-- **Ethos Section**:
-  - **Pinned "Shrink & Slide"**: The section pins for 300% of the viewport. The "Code is Liberty" card shrinks and moves left to make room for the "Principles" card sliding in.
-- **Interactions**:
-  - **Hyper-Expansion**: Partner logos scale up 2x with a teal flash on hover.
-  - **Traveling Beam**: Borrows a beam of light that travels around the borders of active cards.
+  - **Scroll-Read Highlight**: Words ignite from dimmed gray to white as the user scrolls, combined with interactive mouse-hover glow effects.
+- **Ethos & Spectrum**:
+  - **The Assembly**: Cards fly in from 3D space to assemble the visual grid of the Spectrum section.
+  - **Pinned "Shrink & Slide"**: Sophisticated pinning logic where content transitions smoothly through multiple stages.
+
+## Audio & Immersive Systems
+
+The site features an integrated **Ambient Audio Player** engineered for minimal friction:
+- **Smart Loading**: Handles browser autoplay restrictions gracefully.
+- **HUD Feedback**: Pulsing visual states and interactive iconography.
+- **Fail-Safe**: Integrated error reporting and visual status indicators.
 
 ## Technology Stack
 
-- **Core**: HTML5, CSS3 (Variables & Glassmorphism), Vanilla JS.
-- **Animation**: [GSAP](https://greensock.com/) (ScrollTrigger, MatchMedia).
-- **Typography**: [SplitType](https://github.com/lukeed/split-type) for precise text motion.
-- **Smoothing**: [Lenis](https://github.com/studio-freight/lenis) for inertial scrolling.
-- **Asset Processing**: Custom Python scripts (`process_videos_onnx.py`) using U2Net for high-fidelity video background removal.
+- **Core**: HTML5, CSS3, Vanilla JS.
+- **Animation**: [GSAP](https://greensock.com/) (ScrollTrigger, MatchMedia), **Lenis** (Smooth Scroll).
+- **Typography**: **Neue Machina** (Digital-native aesthetic), **SplitType** for text fragmentation.
+- **Asset Processing**: Custom Python scripts for video background removal and image optimization.
 
 ## Local Development
 
@@ -37,12 +41,12 @@ A high-fidelity, immersive portfolio website for Aurora Ventures, a blockchain v
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. **Run the Site**:
-   Simply open `index.html` in your browser or use a live server.
+2. **Run the Site**: Open `index.html` via any local server (e.g., VS Code Live Server).
 
 ## Status
-- [x] Hero Section (3D, Video, Nav)
-- [x] Manifesto (Cinematic Reveal)
-- [x] Ethos (Pinned Animation, Video Integration)
-- [x] Partnership (Grid, Logo Effects)
+- [x] Hero Section (3D, Video, Audio)
+- [x] Manifesto (Scroll-Read Highlight)
+- [x] Ethos (Pinned Sequence)
+- [x] Spectrum (The Assembly)
+- [x] Partnership (Grid, Effects)
 - [ ] Portfolio/Projects Section (Next Phase)
