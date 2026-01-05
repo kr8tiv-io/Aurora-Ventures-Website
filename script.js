@@ -1120,6 +1120,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Equity Video: 2D mouse tracking tilt
+    {
+        const equityCard = document.querySelector("#equity-card");
+        const equityVideoWrap = equityCard?.querySelector(".equity-video-wrap");
+
+        if (equityCard && equityVideoWrap) {
+            gsap.set(equityVideoWrap, { transformOrigin: "center center" });
+
+            equityCard.addEventListener("mousemove", (e) => {
+                const rect = equityCard.getBoundingClientRect();
+                const xPercent = (e.clientX - rect.left) / rect.width - 0.5;
+                const yPercent = (e.clientY - rect.top) / rect.height - 0.5;
+
+                gsap.to(equityVideoWrap, {
+                    rotation: xPercent * 30,
+                    x: xPercent * 12,
+                    y: yPercent * 12,
+                    scale: 1.05,
+                    duration: 0.35,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            });
+
+            equityCard.addEventListener("mouseleave", () => {
+                gsap.to(equityVideoWrap, {
+                    rotation: 0,
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "power3.out"
+                });
+            });
+        }
+    }
+
     // Final refresh on load
     window.addEventListener("load", () => {
         ScrollTrigger.refresh();

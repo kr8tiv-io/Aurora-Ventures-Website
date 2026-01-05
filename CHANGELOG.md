@@ -2,6 +2,17 @@
 
 All notable changes to the Aurora Ventures website will be documented in this file.
 
+## [2026-01-04] - Equity & Jarvis Media Pass
+
+### Added
+- Added transparent WebM treatments for `jarvis.mp4` and `equity.mp4` via ONNX matting.
+- Integrated the Hybrid Model split layout with interactive equity media panel.
+- Added founder social icon stack (LinkedIn, X, Linktree).
+
+### Changed
+- Replaced project backgrounds with local Aura videos and added circular project badges.
+- Updated ONNX processing to close small mask gaps during video matting.
+
 ## [2026-01-02] - Documentation & Photo Refinement
 
 ### Added
