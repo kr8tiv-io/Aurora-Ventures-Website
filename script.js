@@ -1067,19 +1067,65 @@ document.addEventListener("DOMContentLoaded", () => {
     // NON-PINNED ANIMATIONS (Outside matchMedia - always active)
     // ----------------------------------------------------------------
 
-    // Founder Image Parallax
-    const founderMedia = document.querySelector(".founder-media");
-    if (founderMedia) {
-        gsap.from(".founder-image", {
-            scale: 1.12,
-            ease: "none",
-            scrollTrigger: {
-                trigger: founderMedia,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true
-            }
-        });
+    // Founder Section: entrance + tilt
+    {
+        const founderSection = document.querySelector("#founder");
+        const founderMedia = document.querySelector(".founder-media");
+        const founderContent = document.querySelector(".founder-content");
+
+        if (founderSection && founderMedia && founderContent) {
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: founderSection,
+                    start: "top 80%",
+                    end: "bottom 50%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+
+            tl.fromTo(
+                founderMedia,
+                { xPercent: -100, opacity: 0 },
+                { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                0
+            ).fromTo(
+                founderContent,
+                { xPercent: 100, opacity: 0 },
+                { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                0
+            );
+
+            const addTilt = (target) => {
+                const strength = 12;
+                gsap.set(target, { transformPerspective: 900, transformOrigin: "center center" });
+
+                target.addEventListener("mousemove", (e) => {
+                    const rect = target.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width - 0.5;
+                    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+                    gsap.to(target, {
+                        rotationY: x * strength,
+                        rotationX: -y * strength,
+                        duration: 0.4,
+                        ease: "power2.out",
+                        overwrite: "auto"
+                    });
+                });
+
+                target.addEventListener("mouseleave", () => {
+                    gsap.to(target, {
+                        rotationY: 0,
+                        rotationX: 0,
+                        duration: 0.8,
+                        ease: "power3.out"
+                    });
+                });
+            };
+
+            addTilt(founderMedia);
+            addTilt(founderContent);
+        }
     }
 
     // Ethos Cube: 2D Spin (Steering Wheel Style)
@@ -1117,6 +1163,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     ease: "elastic.out(1, 0.3)"
                 });
             });
+        }
+    }
+
+    // Scroll Marquee: Pinned horizontal pull
+    {
+        const marqueeSection = document.querySelector("#scroll-marquee");
+        const marqueeText = marqueeSection?.querySelector(".marquee-text");
+
+        if (marqueeSection && marqueeText) {
+            gsap.set(marqueeText, { x: 0 });
+
+            gsap.to(marqueeText, {
+                x: () => -(marqueeText.scrollWidth - window.innerWidth),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: marqueeSection,
+                    start: "top top",
+                    end: () => "+=" + (marqueeText.scrollWidth - window.innerWidth),
+                    scrub: true,
+                    pin: true,
+                    pinSpacing: true,
+                    anticipatePin: 1
+                }
+            });
+
+            window.addEventListener("resize", () => ScrollTrigger.refresh());
         }
     }
 

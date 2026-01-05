@@ -1706,8 +1706,8 @@
 
         .founder {
             display: grid;
-            grid-template-columns: minmax(0, 1.25fr) minmax(0, 3fr);
-            gap: 4rem;
+            grid-template-columns: 2fr 3fr;
+            gap: 3rem;
             align-items: center;
             position: relative;
             padding-right: 4.5rem;
@@ -1717,8 +1717,21 @@
             position: relative;
             border-radius: 32px;
             overflow: hidden;
-            min-height: 7.5vh;
+            width: min(400px, 90vw);
+            height: min(400px, 90vw);
+            border: 1px solid rgba(122, 248, 214, 0.25);
+            background: linear-gradient(140deg, rgba(12, 18, 32, 0.9), rgba(10, 14, 26, 0.4));
             box-shadow: 0 30px 70px rgba(6, 10, 22, 0.55);
+        }
+
+        .founder-media::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(122, 248, 214, 0.15), transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(108, 201, 255, 0.12), transparent 60%);
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .founder-image {
@@ -1734,27 +1747,24 @@
             transform: scale(1.03);
         }
 
-        .founder-socials {
+        .founder-content {
+            position: relative;
+            padding: 2.8rem;
+            border-radius: 28px;
+            border: 1px solid var(--c-border-soft);
+            background: linear-gradient(150deg, rgba(18, 22, 36, 0.82), rgba(10, 14, 26, 0.55));
+            box-shadow: 0 28px 60px rgba(6, 10, 22, 0.45);
+            overflow: hidden;
+        }
+
+        .founder-content::before {
+            content: "";
             position: absolute;
-            right: 1.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
-            z-index: 3;
-        }
-
-        .founder-socials .social-link {
-            width: 38px;
-            height: 38px;
-            background: rgba(10, 14, 26, 0.55);
-            box-shadow: 0 12px 26px rgba(6, 10, 22, 0.45);
-            backdrop-filter: blur(6px);
-        }
-
-        .founder-socials .social-link:hover {
-            transform: translateY(-2px) scale(1.05);
+            inset: 0;
+            opacity: 0.18;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.5px, transparent 1px);
+            background-size: 3px 3px;
         }
 
         .founder-role {
@@ -1770,25 +1780,29 @@
         .founder-bio {
             color: var(--c-muted);
             line-height: 1.7;
-            max-width: 520px;
+            position: relative;
+            z-index: 1;
         }
 
         .founder-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2.6rem;
-            margin-top: 2.4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.6rem 2.2rem;
+            margin-top: 2.2rem;
             padding-top: 2rem;
             border-top: 1px solid var(--c-border-soft);
+            position: relative;
+            z-index: 1;
         }
 
-        .founder-value {
+        .founder-stat-value {
             font-family: var(--f-head);
-            font-size: 2.6rem;
+            font-size: clamp(1.2rem, 1.6vw, 2.2rem);
             display: block;
+            text-transform: uppercase;
         }
 
-        .founder-label {
+        .founder-stat-label {
             text-transform: uppercase;
             letter-spacing: 0.2em;
             font-size: 0.6rem;
@@ -1829,7 +1843,8 @@
         .service-card::after,
         .cta-panel::after,
         .metric-card::after,
-        .project-card::after {
+        .project-card::after,
+        .spark-border::after {
             content: "";
             position: absolute;
             inset: -1px;
@@ -1851,6 +1866,11 @@
             mask-composite: exclude;
             animation: border-spark var(--spark-speed, 16s) linear infinite;
             animation-delay: var(--spark-delay, 0s);
+        }
+
+        .spark-border>* {
+            position: relative;
+            z-index: 2;
         }
 
         .nav-shell>*,
@@ -2093,15 +2113,13 @@
             }
 
             .founder-media {
-                min-height: 6.25vh;
+                width: min(320px, 80vw);
+                height: min(320px, 80vw);
+                margin: 0 auto;
             }
 
-            .founder-socials {
-                position: static;
-                transform: none;
-                flex-direction: row;
-                justify-content: flex-start;
-                margin-top: 1.5rem;
+            .founder-content {
+                padding: 2.2rem;
             }
 
             #equity-card {
@@ -2280,6 +2298,41 @@
             opacity: 0.3;
             pointer-events: none;
             z-index: 0;
+        }
+
+        /* Scroll Marquee */
+        #scroll-marquee {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(160deg, rgba(8, 12, 22, 0.85), rgba(8, 12, 22, 0.55));
+        }
+
+        .marquee-wrap {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .marquee-text {
+            font-family: 'Neue Machina', sans-serif;
+            font-weight: 800;
+            font-size: min(15vw, 12rem);
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.05);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            transition: color 0.5s var(--ease), text-shadow 0.5s var(--ease);
+            will-change: transform;
+        }
+
+        #scroll-marquee:hover .marquee-text {
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow:
+                0 0 18px rgba(122, 248, 214, 0.5),
+                0 0 36px rgba(154, 123, 255, 0.45);
         }
 
         /* Service Lists */
@@ -2901,8 +2954,8 @@
                         </div>
 
                         <p class="section-body" style="margin-top: 0;">
-                            The old structures are crumbling. We are the architects of what comes next. From the soil of
-                            the earth to the cloud of the ether.
+                            Decentralization is not a choice; it is an inevitability. We forge the keys to the new
+                            digital kingdom, bridging the gap between legacy capital and the infinite machine.
                         </p>
                     </div>
                 </div>
@@ -2918,6 +2971,14 @@
                     </ul>
                 </div>
 
+            </div>
+        </section>
+
+        <section id="scroll-marquee">
+            <div class="marquee-wrap">
+                <div class="marquee-text">
+                    ARCHITECTING THE ETHER /// CODE IS LIBERTY /// CYPHERPUNKS WILL INHERIT THE EARTH
+                </div>
             </div>
         </section>
 
@@ -3109,10 +3170,10 @@
         </section>
 
         <section class="founder" id="founder">
-            <div class="founder-media reveal">
-                <img class="founder-image" src="assets/matt_architect.png" alt="Matt Haynes Portrait">
+            <div class="founder-media reveal spark-border">
+                <img class="founder-image" src="assets/Matt.png" alt="Matt Haynes Portrait">
             </div>
-            <div class="founder-content reveal">
+            <div class="founder-content reveal spark-border">
                 <span class="type-label founder-role">The Architect</span>
                 <h2 class="section-title text-glow-fx founder-name">Matt Haynes</h2>
                 <p class="founder-bio">
@@ -3122,20 +3183,27 @@
                     compliance and the decentralized ethos.
                 </p>
                 <div class="founder-stats">
-                    <div>
-                        <span class="founder-value">2017</span>
-                        <span class="founder-label">Est.</span>
+                    <div class="founder-stat">
+                        <span class="founder-stat-label">Est.</span>
+                        <span class="founder-stat-value">2017</span>
                     </div>
-                    <div>
-                        <span class="founder-value">$20M+</span>
-                        <span class="founder-label">Raised Last Cycle</span>
+                    <div class="founder-stat">
+                        <span class="founder-stat-label">Raised (Last Cycle)</span>
+                        <span class="founder-stat-value">$20M+</span>
+                    </div>
+                    <div class="founder-stat">
+                        <span class="founder-stat-label">Startup Investments</span>
+                        <span class="founder-stat-value">50+</span>
+                    </div>
+                    <div class="founder-stat">
+                        <span class="founder-stat-label">Protocol Contributions</span>
+                        <span class="founder-stat-value">15+</span>
+                    </div>
+                    <div class="founder-stat">
+                        <span class="founder-stat-label">Expertise</span>
+                        <span class="founder-stat-value">Fintech, Regulated &amp; Decentralized</span>
                     </div>
                 </div>
-            </div>
-            <div class="founder-socials" aria-label="Founder social links">
-                <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" class="social-link" aria-label="X"><i class="fab fa-x-twitter"></i></a>
-                <a href="#" class="social-link" aria-label="Linktree"><i class="fab fa-linktree"></i></a>
             </div>
         </section>
 
