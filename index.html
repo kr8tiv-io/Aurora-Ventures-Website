@@ -2717,44 +2717,74 @@
             }
         }
 
-        /* Equity card: span 2 columns on desktop only */
-        @media (min-width: 981px) { #equity-card { grid-column: span 2; } }
-
         /* ============================================================
-           AURORA VENTURES — COMPREHENSIVE MOBILE FIX
+           AURORA VENTURES — MOBILE FIX v2 (COMPLETE REPLACEMENT)
            ============================================================ */
+
+        /* Hero WebGL: desktop margin-top (removed from inline style) */
+        .hero-webgl {
+            margin-top: -150px;
+        }
+
+        /* Equity card: desktop-only span-2 */
+        @media (min-width: 981px) {
+            #equity-card {
+                grid-column: span 2;
+            }
+        }
 
         @media (max-width: 980px) {
 
+            .nav {
+                top: 0.8rem;
+            }
+
             .nav-shell {
-                grid-template-columns: 1fr auto;
-                gap: 0.8rem;
-                padding: calc(0.6rem + env(safe-area-inset-top, 0px)) 1rem;
+                grid-template-columns: 1fr auto !important;
+                gap: 0.6rem !important;
+                padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem !important;
+                width: 94vw !important;
             }
 
             .logo { margin-left: 4px; }
-            .logo-wordmark { max-height: 26px; }
-            .logo-symbol { max-height: 22px; }
+            .logo-wordmark { max-height: 24px; }
+            .logo-symbol { max-height: 20px; }
 
-            .hero-title {
-                max-height: 240px;
-                overflow: hidden;
+            .nav-cta {
+                padding: 0.45rem 1rem;
+                font-size: 0.55rem;
             }
 
             .hero-webgl {
                 margin-top: -60px !important;
-                aspect-ratio: 1242 / 656 !important;
                 max-width: 100% !important;
                 width: 100% !important;
             }
 
+            .hero-title {
+                max-height: 220px;
+                overflow: hidden;
+            }
+
+            .hero-title [data-us-project] {
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            .hero-title [data-us-project] canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
+            .hero-stage {
+                padding: 3rem 2rem 2.4rem !important;
+            }
+
             .hero-top {
-                justify-content: center;
+                justify-content: center !important;
                 text-align: center;
                 width: 100%;
             }
-
-            .hero-tag { flex: none; }
 
             .hero-subtitle {
                 text-align: center;
@@ -2768,31 +2798,122 @@
                 width: 100%;
             }
 
-            .section-split {
-                grid-template-columns: 1fr !important;
+            .powered-by-badge {
                 text-align: center;
+                justify-content: center;
+                width: 100%;
+                display: flex;
             }
 
-            .section-split .glass-card,
-            .section-split .reveal { text-align: center; }
+            .hero-rail,
+            .hero-cards {
+                grid-template-columns: 1fr !important;
+            }
 
-            .section-split .type-label,
-            .section-split .section-title,
-            .section-split .section-body,
-            .section-split .card-body,
-            .section-split .card-title { text-align: center; }
+            /* ETHOS — inline style requires !important */
+            #ethos {
+                min-height: auto !important;
+                padding: 6vh 0 !important;
+                perspective: none !important;
+            }
 
-            .services-grid { grid-template-columns: 1fr !important; }
+            .ethos-container {
+                grid-template-columns: 1fr !important;
+                gap: 2rem !important;
+                width: 90vw !important;
+            }
+
+            #code-card {
+                padding: 2rem 1.4rem !important;
+            }
+
+            #code-card > div {
+                padding: 0 0.4rem !important;
+            }
+
+            #code-card .section-title {
+                font-size: clamp(1.8rem, 6vw, 2.8rem);
+            }
+
+            #code-card .section-body {
+                font-size: 0.95rem;
+            }
+
+            .ethos-video-wrap {
+                height: 120px !important;
+                max-height: 120px !important;
+            }
+
+            #principles-card {
+                padding: 2rem 1.4rem !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .manifesto {
+                min-height: auto;
+                padding: 8vh 7vw;
+            }
+
+            .manifesto-text {
+                font-size: clamp(1.6rem, 5vw, 2.8rem) !important;
+            }
+
+            #scroll-marquee {
+                min-height: auto !important;
+                padding: 8vh 5vw;
+            }
+
+            .marquee-text {
+                font-size: clamp(2.4rem, 8vw, 4.2rem) !important;
+                white-space: normal !important;
+                text-align: center !important;
+                line-height: 1.2 !important;
+                will-change: auto !important;
+            }
+
+            /* SPECTRUM — inline style requires !important */
+            #spectrum {
+                min-height: auto !important;
+                padding: 6vh 0 !important;
+                perspective: none !important;
+                overflow: visible !important;
+            }
+
+            .spectrum-header {
+                margin-bottom: 2rem !important;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr !important;
+                width: 90vw !important;
+                gap: 1.4rem !important;
+            }
+
+            /* Force all service cards visible — override GSAP inline sets */
+            #strategy-card,
+            #visual-card,
+            #growth-card,
+            #dev-card,
+            #equity-card {
+                transform: none !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+            }
+
+            .service-card {
+                padding: 2rem 1.4rem;
+            }
 
             #equity-card {
-                grid-template-columns: 1fr !important;
                 grid-column: span 1 !important;
+                grid-template-columns: 1fr !important;
                 text-align: center;
             }
 
             .equity-video-wrap {
-                width: min(320px, 70vw);
-                height: 200px;
+                width: min(280px, 70vw) !important;
+                height: 180px;
                 margin: 0 auto;
             }
 
@@ -2801,19 +2922,63 @@
                 text-align: center;
             }
 
-            #jarvis { text-align: center; }
+            .section-buffer { display: none !important; }
 
-            .jarvis-panel {
-                padding: 2.4rem 1.6rem;
+            .projects-section {
+                padding: 6vh 0 !important;
+                min-height: auto !important;
+                overflow: visible !important;
                 text-align: center;
             }
 
-            .jarvis-panel .section-body { text-align: center; }
+            .projects-track {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                padding: 0 5vw !important;
+                gap: 1.6rem !important;
+            }
+
+            .project-card,
+            .project-card.project-intro {
+                width: 100% !important;
+                min-height: auto !important;
+            }
+
+            .project-card.project-intro {
+                padding: 2rem 1.4rem !important;
+                background: rgba(255, 255, 255, 0.04) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                border-radius: 24px !important;
+                text-align: center;
+            }
+
+            .project-meta { text-align: center; }
+
+            .partnership-panel { padding: 2rem 1.4rem !important; }
+
+            .partner-logos {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            #jarvis { text-align: center; }
+
+            .jarvis-panel {
+                padding: 2rem 1.4rem !important;
+                text-align: center;
+                width: 90vw !important;
+            }
+
+            .jarvis-panel .section-body,
+            .jarvis-panel .type-label,
+            .jarvis-panel .section-title { text-align: center; }
+
             .jarvis-panel .hero-actions { justify-content: center; }
 
             .jarvis-video-wrap {
-                height: 160px;
-                width: min(90vw, 600px);
+                height: 150px !important;
+                width: min(90vw, 500px) !important;
                 margin: 0 auto;
             }
 
@@ -2821,51 +2986,65 @@
                 grid-template-columns: 1fr !important;
                 padding-right: 0 !important;
                 text-align: center;
+                gap: 2rem !important;
             }
 
             .founder-media {
-                margin: 0 auto;
-                width: min(280px, 70vw);
-                height: min(280px, 70vw);
+                margin: 0 auto !important;
+                width: min(260px, 65vw) !important;
+                height: min(260px, 65vw) !important;
             }
 
-            .founder-content { text-align: center; }
-            .founder-role, .founder-name, .founder-bio { text-align: center; }
+            .founder-content {
+                padding: 2rem 1.4rem !important;
+                text-align: center;
+            }
+
+            .founder-role,
+            .founder-name,
+            .founder-bio { text-align: center; }
 
             .founder-stats {
                 grid-template-columns: 1fr !important;
-                gap: 1.2rem;
+                gap: 1rem !important;
                 text-align: center;
             }
 
             .founder-stat { text-align: center; }
 
             .founder-stat-value {
-                font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+                font-size: clamp(1.1rem, 3.5vw, 1.5rem) !important;
+            }
+
+            .section-split {
+                grid-template-columns: 1fr !important;
+                text-align: center;
+                gap: 2rem !important;
+            }
+
+            .section-split .glass-card,
+            .section-split .reveal { text-align: center; }
+
+            .section-split .glass-card { padding: 2rem 1.4rem; }
+
+            .cta-panel {
+                padding: 2rem 1.4rem !important;
+                width: 90vw !important;
             }
 
             .metric-grid {
-                flex-direction: column;
-                align-items: center;
-                gap: 1.2rem;
+                flex-direction: column !important;
+                align-items: center !important;
+                gap: 1rem !important;
             }
 
             .metric-card {
-                min-width: 0;
-                width: min(90vw, 400px);
+                min-width: 0 !important;
+                width: min(90vw, 360px) !important;
+                padding: 1.4rem 1rem !important;
             }
 
-            .cta-panel { padding: 2.4rem 1.6rem; }
-            .partnership-panel { padding: 2rem 1.4rem; }
-
-            .partner-logos {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .projects-section { text-align: center; }
-            .project-card, .project-card.project-intro { text-align: center; }
-            .project-meta { text-align: center; }
+            .metric { font-size: 2.4rem !important; }
 
             section { text-align: center; }
 
@@ -2875,131 +3054,113 @@
 
             .principles {
                 text-align: left;
-                max-width: 400px;
+                max-width: 360px;
                 margin-left: auto;
                 margin-right: auto;
             }
 
             .unicorn-wrapper { image-rendering: auto; }
-
-            .hero-title [data-us-project] {
-                max-width: 100%;
-                overflow: hidden;
-            }
-
-            .hero-title [data-us-project] canvas {
-                max-width: 100%;
-                height: auto !important;
-            }
         }
 
         @media (max-width: 640px) {
 
             .nav-shell {
-                padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 0.8rem;
-                gap: 0.5rem;
+                padding: calc(0.4rem + env(safe-area-inset-top, 0px)) 0.7rem !important;
+                width: 96vw !important;
             }
 
-            .logo-wordmark { max-height: 22px; }
-            .logo-symbol { max-height: 18px; }
+            .logo-wordmark { max-height: 20px; }
+            .logo-symbol { max-height: 16px; }
 
             .nav-cta {
-                padding: 0.5rem 1rem;
-                font-size: 0.55rem;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.5rem;
             }
 
-            .hero-webgl { margin-top: -30px !important; }
-            .hero-title { max-height: 180px; }
+            .hero-webgl { margin-top: -35px !important; }
+            .hero-title { max-height: 160px; }
 
             .hero-stage {
-                padding: 2.4rem 1.4rem 2rem;
+                padding: 2rem 1.2rem 1.6rem !important;
                 border-radius: 24px;
             }
 
             .hero-top {
                 flex-direction: column;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 0.4rem;
             }
 
             .hero-tag {
-                font-size: 0.55rem;
-                padding: 0.35rem 0.7rem;
+                font-size: 0.5rem;
+                padding: 0.3rem 0.65rem;
             }
 
-            .hero-subtitle { font-size: clamp(0.7rem, 2.8vw, 0.9rem); }
+            .hero-subtitle { font-size: clamp(0.65rem, 2.5vw, 0.85rem) !important; }
 
             .hero-actions {
                 flex-direction: column;
                 align-items: center;
-                gap: 0.8rem;
+                gap: 0.7rem;
             }
 
             .btn {
                 width: 100%;
-                max-width: 320px;
+                max-width: 300px;
             }
 
-            .powered-by-badge {
-                text-align: center;
-                justify-content: center;
+            .ethos-video-wrap {
+                height: 90px !important;
+                max-height: 90px !important;
             }
 
-            .hero-rail { gap: 0.8rem; }
-            .hero-rail .glass-card { padding: 1.4rem 1rem; }
-            .service-card { padding: 1.8rem 1.4rem; }
+            .service-card { padding: 1.6rem 1.2rem; }
 
             .founder-media {
-                width: min(220px, 60vw);
-                height: min(220px, 60vw);
+                width: min(200px, 55vw) !important;
+                height: min(200px, 55vw) !important;
             }
 
-            .founder-content { padding: 1.6rem 1.2rem; }
-
-            .metric-card {
-                width: 100%;
-                padding: 1.4rem 1rem;
-            }
-
-            .metric { font-size: 2.2rem; }
-            .jarvis-panel { padding: 2rem 1.2rem; }
-            .jarvis-video-wrap { height: 130px; }
-            .cta-panel { padding: 2rem 1.2rem; }
-
-            .manifesto-text { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+            .founder-content { padding: 1.4rem 1rem !important; }
+            .jarvis-panel { padding: 1.6rem 1rem !important; }
+            .jarvis-video-wrap { height: 120px !important; }
+            .cta-panel { padding: 1.6rem 1rem !important; }
+            .metric-card { width: 100% !important; }
+            .metric { font-size: 2rem !important; }
         }
 
         @media (max-width: 420px) {
 
             .hero-stage {
-                padding: 2rem 1rem 1.6rem;
-                width: 95vw;
+                padding: 1.6rem 0.8rem 1.2rem !important;
+                width: 96vw;
             }
 
-            .hero-webgl { margin-top: -15px !important; }
-            .hero-title { max-height: 140px; }
+            .hero-webgl { margin-top: -20px !important; }
+            .hero-title { max-height: 120px; }
 
             .hero-tag {
-                font-size: 0.5rem;
-                letter-spacing: 0.18em;
+                font-size: 0.45rem;
+                letter-spacing: 0.16em;
             }
 
             .hero-lede {
                 font-size: 0.85rem;
-                line-height: 1.6;
+                line-height: 1.5;
             }
 
-            .section-title { font-size: clamp(1.6rem, 6vw, 2.4rem); }
-            .section-body { font-size: 0.95rem; }
-            .founder-stats { gap: 0.8rem; }
-            .founder-stat-value { font-size: 1rem; }
+            .section-title { font-size: clamp(1.4rem, 5.5vw, 2.2rem) !important; }
+            .section-body { font-size: 0.9rem; }
+
+            #code-card,
+            #principles-card { padding: 1.4rem 1rem !important; }
+
+            .founder-stat-value { font-size: 1rem !important; }
             .founder-stat-label { font-size: 0.5rem; }
         }
 
         @supports (height: 100svh) {
             .hero { min-height: 100svh; }
-            #scroll-marquee { min-height: 100svh; }
-            .projects-section { min-height: auto; }
         }
 
         @supports (padding: env(safe-area-inset-top)) {
