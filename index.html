@@ -2308,9 +2308,27 @@
             overflow: hidden;
             position: relative;
             isolation: isolate;
-            contain: paint;
-            z-index: 1;
+            /* contain:paint REMOVED — it scopes the stacking context and prevents
+               GSAP's position:fixed pin layer from rendering above siblings.       */
+            z-index: 100;       /* must exceed spectrum (20) and projects (10)      */
             background: transparent;
+        }
+
+        /* Opaque paint-blocker via pseudo-element so the element's own
+           background stays transparent (consistent with the rest of the page)
+           while preventing cards / spectrum from bleeding through the pin.   */
+        #scroll-marquee::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: var(--c-bg, #02030a);
+            z-index: -1;
+        }
+
+        /* GSAP wraps every pinned section in a .pin-spacer div.
+           That wrapper must share the same stacking elevation.               */
+        .pin-spacer:has(> #scroll-marquee) {
+            z-index: 100 !important;
         }
 
         .marquee-wrap {
