@@ -2307,8 +2307,10 @@
             align-items: center;
             overflow: hidden;
             position: relative;
-            z-index: 10;
-            background: linear-gradient(160deg, rgba(8, 12, 22, 0.85), rgba(8, 12, 22, 0.55));
+            isolation: isolate;
+            contain: paint;
+            z-index: 1;
+            background: transparent;
         }
 
         .marquee-wrap {
@@ -2652,6 +2654,20 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* Desktop-only: hide principles card before GSAP animates it in */
+        @media (min-width: 992px) {
+            #principles-card {
+                opacity: 0;
+            }
+        }
+
+        /* Mobile: hide the pin-buffer (only needed for desktop pin separation) */
+        @media (max-width: 991px) {
+            .section-buffer {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -2927,7 +2943,7 @@
         </section>
 
         <section id="ethos"
-            style="min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; perspective: 1000px;">
+            style="min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: clip; perspective: 1000px; position: relative; z-index: 100;">
             <div class="ethos-container"
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; width: min(1200px, 90vw); position: relative;">
 
@@ -2961,7 +2977,7 @@
                 </div>
 
                 <div id="principles-card" class="glass-card"
-                    style="display: flex; flex-direction: column; justify-content: center; opacity: 0; padding: 3.5rem;">
+                    style="display: flex; flex-direction: column; justify-content: center; padding: 3.5rem;">
                     <span class="card-label">Principles</span>
                     <h3 class="card-title text-glow-fx">Alignment before allocation.</h3>
                     <ul class="principles">
@@ -2983,7 +2999,7 @@
         </section>
 
         <section id="spectrum"
-            style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; perspective: 1000px; z-index: 20; background-color: transparent;">
+            style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: visible; perspective: 1000px; z-index: 20;">
 
             <div class="spectrum-header"
                 style="text-align: center; margin-bottom: 3rem; position: relative; z-index: 20;">
