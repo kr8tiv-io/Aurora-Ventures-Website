@@ -1079,15 +1079,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         // single-frame jump that otherwise appears at pin entrance.
                         anticipatePin:    1,
 
-                        onToggle: self => {
-                            // While the marquee is pinned and active, adjacent sections
-                            // immediately below it in the DOM are hidden to prevent any
-                            // residual z-index bleed during the pin window.
-                            const v        = self.isActive ? "hidden" : "";
-                            const spectrum = document.getElementById("spectrum");
-                            const projects = document.querySelector(".projects-section");
-                            if (spectrum) spectrum.style.visibility = v;
-                            if (projects) projects.style.visibility = v;
+                        // Four directional callbacks instead of onToggle.
+                        // onToggle fires once per active-state change; rapid scroll
+                        // reversal can leave neighbours in the wrong state.
+                        // Explicit enter/leave callbacks are deterministic regardless
+                        // of direction.
+                        onEnter: () => {
+                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "hidden");
+                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "hidden");
+                        },
+                        onLeave: () => {
+                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "");
+                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "");
+                        },
+                        onEnterBack: () => {
+                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "hidden");
+                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "hidden");
+                        },
+                        onLeaveBack: () => {
+                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "");
+                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "");
                         }
                         // NOTE: No manual window resize listener here.
                         // ScrollTrigger debounces resize internally. Adding a manual
