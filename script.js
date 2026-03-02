@@ -899,7 +899,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrub: 1,
                     refreshPriority: 20,        // HIGHEST - Calculates first
                     invalidateOnRefresh: true,
-                    anticipatePin: 0            // Prevent jitter
+                    anticipatePin: 0,           // Prevent jitter
+                    onToggle: self => {
+                        const el = document.getElementById("scroll-marquee");
+                        if (el) el.style.visibility = self.isActive ? "hidden" : "";
+                    }
                 }
             });
 
@@ -959,7 +963,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrub: 1,
                     refreshPriority: 10,
                     invalidateOnRefresh: true,
-                    anticipatePin: 0
+                    anticipatePin: 0,
+                    onToggle: self => {
+                        const el = document.querySelector(".projects-section");
+                        if (el) el.style.visibility = self.isActive ? "hidden" : "";
+                    }
                 }
             });
 
@@ -1184,7 +1192,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrub: true,
                     pin: true,
                     pinSpacing: true,
-                    anticipatePin: 1
+                    anticipatePin: 1,
+                    onToggle: self => {
+                        const el = document.getElementById("spectrum");
+                        if (el) el.style.visibility = self.isActive ? "hidden" : "";
+                    }
                 }
             });
 
