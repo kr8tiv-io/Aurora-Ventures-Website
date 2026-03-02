@@ -1194,8 +1194,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     pinSpacing: true,
                     anticipatePin: 1,
                     onToggle: self => {
-                        const el = document.getElementById("spectrum");
-                        if (el) el.style.visibility = self.isActive ? "hidden" : "";
+                        const v = self.isActive ? "hidden" : "";
+                        const spectrum = document.getElementById("spectrum");
+                        if (spectrum) spectrum.style.visibility = v;
+                        const projects = document.querySelector(".projects-section");
+                        if (projects) projects.style.visibility = v;
                     }
                 }
             });
