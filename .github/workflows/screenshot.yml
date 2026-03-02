@@ -1,0 +1,98 @@
+name: Screenshot Verification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install @playwright/test
+          npx playwright install chromium --with-deps
+
+      - name: Take screenshots
+        run: |
+          cat > screenshot.js << 'JSEOF'
+          const { chromium } = require('@playwright/test');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
+            await page.setViewportSize({ width: 1440, height: 900 });
+            console.log('Navigating to auroraventures.agency...');
+            try {
+              await page.goto('https://auroraventures.agency', {
+                waitUntil: 'networkidle',
+                timeout: 30000
+              });
+            } catch(e) {
+              console.log('Nav error (may be OK):', e.message);
+            }
+            const title = await page.title();
+            console.log('Page title:', title);
+
+            // Screenshot: top of page
+            await page.screenshot({ path: 'aurora_top.png', fullPage: false });
+            console.log('TOP screenshot taken');
+
+            // Scroll to 30% - near marquee
+            await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.3));
+            await page.waitForTimeout(1500);
+            await page.screenshot({ path: 'aurora_mid.png', fullPage: false });
+            console.log('MID screenshot taken');
+
+            // Scroll to marquee section
+            await page.evaluate(() => {
+              const m = document.getElementById('scroll-marquee');
+              if (m) m.scrollIntoView(); else window.scrollTo(0, document.body.scrollHeight * 0.5);
+            });
+            await page.waitForTimeout(1500);
+            await page.screenshot({ path: 'aurora_marquee.png', fullPage: false });
+            console.log('MARQUEE screenshot taken');
+
+            // Scroll further into marquee pin range
+            await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
+            await page.waitForTimeout(1500);
+            await page.screenshot({ path: 'aurora_pin.png', fullPage: false });
+            console.log('PIN screenshot taken');
+
+            // Check projects visibility
+            const vis = await page.evaluate(() => {
+              const e = document.querySelector('.projects-section');
+              return e ? window.getComputedStyle(e).visibility : 'not found';
+            });
+            console.log('Projects visibility during marquee pin:', vis);
+
+            // Check overflow on scroll-marquee
+            const style = await page.evaluate(() => {
+              const e = document.getElementById('scroll-marquee');
+              if (!e) return 'not found';
+              const s = window.getComputedStyle(e);
+              return { overflow: s.overflow, isolation: s.isolation, zIndex: s.zIndex };
+            });
+            console.log('Scroll-marquee computed style:', JSON.stringify(style));
+
+            // Full page screenshot
+            await page.screenshot({ path: 'aurora_full.png', fullPage: true });
+            console.log('FULL screenshot taken');
+
+            await browser.close();
+            console.log('DONE');
+          })();
+          JSEOF
+          node screenshot.js
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aurora-screenshots
+          path: aurora_*.png
+          retention-days: 7
