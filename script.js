@@ -10,6 +10,14 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.registerPlugin(ScrollTrigger);
     gsap.ticker.lagSmoothing(0);
 
+    // normalizeScroll mitigates mobile address-bar viewport-height thrashing and
+    // stabilises touch momentum across browsers. It is registered here — before
+    // Lenis — so the two do not race over the same scroll events.
+    // allowNestedScroll:true prevents it conflicting with the Lenis handler.
+    // lockAxis:false is required so that the horizontal marquee track tween is
+    // not accidentally blocked on touch devices.
+    ScrollTrigger.normalizeScroll({ allowNestedScroll: true, lockAxis: false });
+
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const supportsClipPath = CSS.supports("clip-path", "inset(10% 10% 10% 10% round 20px)");
     const allowCustomCursor = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -865,7 +873,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const masterPinContext = gsap.matchMedia();
 
-    masterPinContext.add("(min-width: 992px)", () => {
+    masterPinContext.add("(min-width: 800px)", () => {
 
         // ----------------------------------------------------------------
         // ETHOS: PINNED "SHRINK & SLIDE" (Priority: 20 - FIRST)
@@ -1013,6 +1021,84 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // ----------------------------------------------------------------
+        // SCROLL MARQUEE: Pinned Horizontal Pull  (Priority: 15 — Mid)
+        // ----------------------------------------------------------------
+        // Rationale for placement inside masterPinContext:
+        //   All pinned ScrollTriggers must share one matchMedia context so that
+        //   their lifecycles (create / kill / re-create on resize) are
+        //   coordinated. A trigger registered outside this context cannot
+        //   participate in the refreshPriority queue, which is the root cause
+        //   of the pin-spacer height bleed into adjacent sections.
+        //
+        // refreshPriority:15 places this trigger's recalculation between
+        //   #ethos (priority 20, highest in DOM) and #spectrum (priority 10),
+        //   matching strict DOM top-to-bottom flow.
+        //
+        // invalidateOnRefresh:true forces the functional x-value
+        //   x: () => -(track.scrollWidth - window.innerWidth)
+        //   to re-evaluate on every GSAP refresh, so resizing never produces
+        //   a stale translation distance that under- or over-shoots the track.
+        {
+            const marqueeSection = document.querySelector("#scroll-marquee");
+            const marqueeTrack   = marqueeSection?.querySelector(".marquee-text");
+
+            if (marqueeSection && marqueeTrack) {
+                gsap.set(marqueeTrack, { x: 0 });
+
+                gsap.to(marqueeTrack, {
+                    // Functional value: recalculated on every refresh().
+                    // Avoids bounding errors that occur with hardcoded xPercent:-100
+                    // when the track width does not equal exactly one viewport width.
+                    x: () => -(marqueeTrack.scrollWidth - window.innerWidth),
+                    ease: "none",
+
+                    // invalidateOnRefresh re-evaluates the functional value above
+                    // each time the GSAP engine refreshes the layout. Without it,
+                    // the tween caches the distance from the initial page-load and
+                    // produces an incorrect translation after any resize event.
+                    invalidateOnRefresh: true,
+
+                    scrollTrigger: {
+                        trigger:          marqueeSection,
+                        start:            "top top",
+                        end:              () => "+=" + (marqueeTrack.scrollWidth - window.innerWidth),
+                        scrub:            true,
+                        pin:              true,
+                        pinSpacing:       true,
+
+                        // refreshPriority:15 — sits between ethos (20) and spectrum (10)
+                        // in the priority queue so that GSAP calculates the pin-spacer
+                        // for this section only after ethos has locked its own spacer,
+                        // but before spectrum claims its portion of the document height.
+                        refreshPriority:  15,
+
+                        invalidateOnRefresh: true,
+
+                        // anticipatePin:1 pre-computes the upcoming fixed position one
+                        // frame before the pin threshold is crossed, eliminating the
+                        // single-frame jump that otherwise appears at pin entrance.
+                        anticipatePin:    1,
+
+                        onToggle: self => {
+                            // While the marquee is pinned and active, adjacent sections
+                            // immediately below it in the DOM are hidden to prevent any
+                            // residual z-index bleed during the pin window.
+                            const v        = self.isActive ? "hidden" : "";
+                            const spectrum = document.getElementById("spectrum");
+                            const projects = document.querySelector(".projects-section");
+                            if (spectrum) spectrum.style.visibility = v;
+                            if (projects) projects.style.visibility = v;
+                        }
+                        // NOTE: No manual window resize listener here.
+                        // ScrollTrigger debounces resize internally. Adding a manual
+                        // listener causes marker duplication and violent layout
+                        // jumps when the mobile browser address bar collapses.
+                    }
+                });
+            }
+        }
+
+        // ----------------------------------------------------------------
         // PROJECTS HORIZONTAL SCROLL (Priority: 1 - LAST)
         // ----------------------------------------------------------------
         const projectsSection = document.querySelector(".projects-section");
@@ -1069,7 +1155,61 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
         }
 
-    }); // End of masterPinContext
+    }); // End of masterPinContext desktop branch (min-width: 800px)
+
+    // ----------------------------------------------------------------
+    // MOBILE BRANCH  (max-width: 799px)
+    // ----------------------------------------------------------------
+    // On viewports narrower than 800 px the horizontal scroll-jacking is
+    // entirely abandoned. Forcing horizontal translation via vertical scroll
+    // on touch devices causes usability trapping and GPU compositing lag.
+    //
+    // gsap.matchMedia() cleanly isolates this context: when the viewport
+    // expands past 799 px, GSAP automatically kills every ScrollTrigger
+    // registered below and runs the cleanup return function — no manual
+    // teardown required.
+    //
+    // Project cards are stacked vertically by the @media (max-width:799px)
+    // CSS rule in index.html. Here we layer simple, GPU-friendly entrance
+    // tweens (yPercent + opacity) as each card scrolls into view. No pin,
+    // no scrub, no scroll-hijack — pure native momentum scrolling.
+    masterPinContext.add("(max-width: 799px)", () => {
+        const projectCards = document.querySelectorAll(".project-card");
+
+        projectCards.forEach((card) => {
+            // fromTo so the starting state is guaranteed regardless of any
+            // earlier inline GSAP sets applied by the desktop branch.
+            gsap.fromTo(
+                card,
+                { yPercent: 14, opacity: 0, willChange: "transform, opacity" },
+                {
+                    yPercent:  0,
+                    opacity:   1,
+                    ease:      "power2.out",
+                    // clearProps releases will-change after the tween completes
+                    // so the browser can free the compositor layer.
+                    onComplete() { gsap.set(card, { clearProps: "willChange" }); },
+                    scrollTrigger: {
+                        trigger:       card,
+                        start:         "top 88%",
+                        end:           "top 52%",
+                        // toggleActions replays the entrance if the user scrolls
+                        // back up past the trigger — keeps the experience coherent.
+                        toggleActions: "play none none reverse",
+                        // No pin, no scrub: purely viewport-state-toggled.
+                    }
+                }
+            );
+        });
+
+        // Return a cleanup function — GSAP calls this automatically when the
+        // viewport crosses back above 800 px so no scroll triggers leak.
+        return () => {
+            ScrollTrigger.getAll()
+                .filter(st => st.vars.toggleActions === "play none none reverse")
+                .forEach(st => st.kill());
+        };
+    });
 
     // ----------------------------------------------------------------
     // NON-PINNED ANIMATIONS (Outside matchMedia - always active)
@@ -1174,39 +1314,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Scroll Marquee: Pinned horizontal pull
-    {
-        const marqueeSection = document.querySelector("#scroll-marquee");
-        const marqueeText = marqueeSection?.querySelector(".marquee-text");
-
-        if (marqueeSection && marqueeText) {
-            gsap.set(marqueeText, { x: 0 });
-
-            gsap.to(marqueeText, {
-                x: () => -(marqueeText.scrollWidth - window.innerWidth),
-                ease: "none",
-                scrollTrigger: {
-                    trigger: marqueeSection,
-                    start: "top top",
-                    end: () => "+=" + (marqueeText.scrollWidth - window.innerWidth),
-                    scrub: true,
-                    pin: true,
-                    pinSpacing: true,
-                    anticipatePin: 1,
-                    onToggle: self => {
-                        const v = self.isActive ? "hidden" : "";
-                        const spectrum = document.getElementById("spectrum");
-                        if (spectrum) spectrum.style.visibility = v;
-                        const projects = document.querySelector(".projects-section");
-                        if (projects) projects.style.visibility = v;
-                    }
-                }
-            });
-
-            window.addEventListener("resize", () => ScrollTrigger.refresh());
-        }
-    }
-
     // Equity Video: 2D mouse tracking tilt
     {
         const equityCard = document.querySelector("#equity-card");
@@ -1244,8 +1351,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Final refresh on load
+    // Final sort + refresh on load
     window.addEventListener("load", () => {
+        // ScrollTrigger.sort() re-orders every registered trigger by its
+        // absolute top position in the document. This is the definitive fix
+        // for pin-spacer bleed: if triggers are registered in any order other
+        // than strict DOM top-to-bottom flow, GSAP can calculate a later
+        // section's pin-spacer before an earlier section has claimed its
+        // correct document height — producing cascading offset errors.
+        //
+        // sort() is called BEFORE refresh() so that the very first full
+        // layout recalculation is performed using the corrected ordering.
+        // Calling them in the opposite order would still leave a single bad
+        // pass of stale positions on the page before sort takes effect.
+        ScrollTrigger.sort();
         ScrollTrigger.refresh();
     });
 
