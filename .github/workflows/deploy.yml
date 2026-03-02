@@ -14,27 +14,34 @@ jobs:
       - name: Install lftp
         run: sudo apt-get install -y lftp
 
-      - name: Test FTP connectivity
-        run: |
-          echo "Testing FTP connection to 31.170.161.141:21"
-          timeout 15 bash -c "echo '' | nc -w 5 31.170.161.141 21" && echo "Port 21 OPEN" || echo "Port 21 CLOSED/TIMEOUT"
-
-      - name: Deploy via FTP
+      - name: Deploy via FTP (direct put)
         run: |
           lftp -c "
             set net:max-retries 3
             set net:timeout 30
             set ftp:ssl-allow false
             set ssl:verify-certificate false
+            set ftp:use-feat no
             open ftp://31.170.161.141:21
             user u637913108.auroraventures.agency 'PwJgi|lVx;5f8;Ms'
+            echo '=== PRE-UPLOAD ls ==='
             ls
-            mirror -R --parallel=5 \
-              --exclude-glob .git/ \
-              --exclude-glob .github/ \
-              --exclude-glob '*.md' \
-              --exclude-glob '*.py' \
-              . /
-            echo 'FTP upload complete'
+            echo '=== Uploading index.html ==='
+            put index.html -o index.html
+            echo '=== Uploading script.js ==='
+            put script.js -o script.js
+            echo '=== Uploading assets (mirror) ==='
+            mirror -R --parallel=5 --transfer-all assets/ assets/
+            echo '=== POST-UPLOAD ls ==='
+            ls
+            echo '=== Verifying fix in index.html ==='
+            get index.html -o /tmp/verify.html
+            echo 'Deploy complete'
             bye
           "
+
+      - name: Verify fix applied
+        run: |
+          grep -c 'projects-section.*hidden\|hidden.*projects-section\|projects.*visibility' /tmp/verify.html && echo 'JS FIX CONFIRMED' || echo 'checking index...'
+          grep -c 'overflow: hidden' /tmp/verify.html && echo 'CSS OVERFLOW CONFIRMED' || echo 'CSS NOT FOUND'
+          wc -c /tmp/verify.html
