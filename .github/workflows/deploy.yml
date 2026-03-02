@@ -1,0 +1,108 @@
+name: Deploy to Hostinger
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create deployment zip
+        run: |
+          zip -r aurora_site_deploy.zip . \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "*.md" \
+            --exclude "node_modules/*"
+          ls -lh aurora_site_deploy.zip
+
+      - name: Deploy to Hostinger
+        env:
+          HOSTINGER_TOKEN: ujqd3QL6BMCARTRpNwwwNJGqmTZ6CJRpyhWb0w5Iad6daa92
+        run: |
+          python3 << 'PYEOF'
+          import urllib.request, urllib.error, json, math, os, sys
+          from pathlib import Path
+
+          TOKEN    = os.environ["HOSTINGER_TOKEN"]
+          USERNAME = "u637913108"
+          DOMAIN   = "auroraventures.agency"
+          BASE     = "https://developers.hostinger.com"
+          ARCHIVE  = Path("aurora_site_deploy.zip")
+          CHUNK    = 10 * 1024 * 1024
+
+          def api_post(path, body=None, extra=None):
+              url = f"{BASE}{path}"
+              data = json.dumps(body).encode() if body else b""
+              req = urllib.request.Request(url, data=data, method="POST")
+              req.add_header("Authorization", f"Bearer {TOKEN}")
+              req.add_header("Content-Type", "application/json")
+              if extra:
+                  for k, v in extra.items(): req.add_header(k, v)
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r:
+                      return r.status, json.loads(r.read())
+              except urllib.error.HTTPError as e:
+                  return e.code, json.loads(e.read().decode() or '{}')
+              except Exception as e:
+                  return None, {"message": str(e)}
+
+          # Stage 1
+          print("Stage 1: Get upload credentials")
+          st, resp = api_post("/api/hosting/v1/files/upload-urls", {"username": USERNAME, "domain": DOMAIN})
+          print(f"  Status: {st}")
+          assert st in (200, 201), f"Stage 1 failed: {resp}"
+          upload_url = resp["url"]
+          auth_key   = resp["auth_key"]
+          rest_key   = resp["rest_auth_key"]
+          print(f"  Upload URL: {upload_url}")
+
+          # Stage 2: TUS upload
+          print("Stage 2: TUS upload")
+          data = ARCHIVE.read_bytes()
+          total = len(data)
+          print(f"  File: {ARCHIVE.name} ({total:,} bytes)")
+          tus_url = f"{upload_url.rstrip('/')}/{ARCHIVE.name}?override=true"
+
+          # TUS POST
+          req2 = urllib.request.Request(tus_url, data=b"", method="POST")
+          req2.add_header("X-Auth", auth_key)
+          req2.add_header("X-Auth-Rest", rest_key)
+          req2.add_header("Upload-Length", str(total))
+          req2.add_header("Tus-Resumable", "1.0.0")
+          req2.add_header("Content-Type", "application/offset+octet-stream")
+          req2.add_header("Content-Length", "0")
+          with urllib.request.urlopen(req2, timeout=30) as r:
+              tus_loc = r.headers.get("Location") or ""
+          print(f"  TUS location: {tus_loc[:60]}")
+          patch_base = tus_loc if tus_loc.startswith("http") else f"{upload_url.split('/')[0]}//{upload_url.split('/')[2]}{tus_loc}"
+
+          # TUS PATCH chunks
+          n_chunks = math.ceil(total / CHUNK)
+          for i in range(n_chunks):
+              offset = i * CHUNK
+              chunk = data[offset: offset + CHUNK]
+              req3 = urllib.request.Request(patch_base, data=chunk, method="PATCH")
+              req3.add_header("X-Auth", auth_key)
+              req3.add_header("X-Auth-Rest", rest_key)
+              req3.add_header("Tus-Resumable", "1.0.0")
+              req3.add_header("Upload-Offset", str(offset))
+              req3.add_header("Content-Type", "application/offset+octet-stream")
+              req3.add_header("Content-Length", str(len(chunk)))
+              with urllib.request.urlopen(req3, timeout=120) as r:
+                  ps = r.status
+              print(f"  Chunk {i+1}/{n_chunks}: {ps}")
+              assert ps in (200, 204), f"Chunk {i+1} failed: {ps}"
+          print("  Upload complete!")
+
+          # Stage 3: Deploy
+          print("Stage 3: Trigger deploy")
+          st3, resp3 = api_post(f"/api/hosting/v1/accounts/{USERNAME}/websites/{DOMAIN}/deploy", {"archive_path": ARCHIVE.name})
+          print(f"  Status: {st3} — {resp3}")
+          assert st3 in (200, 201, 202, 204), f"Deploy failed: {resp3}"
+          print("SUCCESS!")
+          PYEOF
