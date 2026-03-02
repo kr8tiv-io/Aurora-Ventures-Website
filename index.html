@@ -2300,7 +2300,7 @@
             z-index: 0;
         }
 
-        /* Scroll Marquee */
+        /* Scroll Marquee — Desktop (pinned horizontal pull via GSAP) */
         #scroll-marquee {
             min-height: 100vh;
             display: flex;
@@ -2335,6 +2335,36 @@
             text-shadow:
                 0 0 18px rgba(122, 248, 214, 0.5),
                 0 0 36px rgba(154, 123, 255, 0.45);
+        }
+
+        /* Scroll Marquee — Mobile (≤799px)
+           The JS horizontal pin is abandoned at this breakpoint.
+           The text reflows into a centred, wrapping display so it
+           reads cleanly as a section divider without any GSAP transform. */
+        @media (max-width: 799px) {
+            #scroll-marquee {
+                min-height: auto;
+                padding: 10vh 7vw;
+                /* contain:paint is removed — no GSAP pin means no compositing  */
+                /* layer is needed, so we let the browser paint it normally.     */
+                contain: none;
+                justify-content: center;
+            }
+
+            .marquee-wrap {
+                overflow: visible;
+            }
+
+            .marquee-text {
+                /* Larger responsive clamp so the phrase wraps to ~2 lines and
+                   retains visual impact on narrow screens. */
+                font-size: clamp(2.6rem, 9vw, 4.8rem);
+                white-space: normal;
+                text-align: center;
+                line-height: 1.18;
+                /* On mobile the will-change layer wastes GPU memory — clear it. */
+                will-change: auto;
+            }
         }
 
         /* Service Lists */
