@@ -1125,7 +1125,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrollTrigger: {
                         trigger: projectsSection,
                         start: "top top",
-                        end: () => `+=${getScrollDistance()}`,
+                        end: () => `+=${getScrollDistance() * 1.8}`,
                         scrub: true,
                         pin: true,
                         refreshPriority: 1,         // LAST - After Spectrum
@@ -1185,6 +1185,19 @@ document.addEventListener("DOMContentLoaded", () => {
     // tweens (yPercent + opacity) as each card scrolls into view. No pin,
     // no scrub, no scroll-hijack — pure native momentum scrolling.
     masterPinContext.add("(max-width: 799px)", () => {
+        // MOBILE RESET: Clear all desktop GSAP initial states.
+        const mobileResetTargets = [
+            "#visual-card", "#strategy-card", "#growth-card",
+            "#dev-card", "#equity-card", "#code-card", "#principles-card",
+            ".spectrum-header"
+        ];
+        mobileResetTargets.forEach(sel => {
+            const el = document.querySelector(sel);
+            if (el) gsap.set(el, { clearProps: "all" });
+        });
+        document.getElementById("spectrum")?.style.removeProperty("visibility");
+        document.querySelector(".projects-section")?.style.removeProperty("visibility");
+
         const projectCards = document.querySelectorAll(".project-card");
 
         projectCards.forEach((card) => {
