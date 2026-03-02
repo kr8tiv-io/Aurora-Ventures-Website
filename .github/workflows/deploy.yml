@@ -11,17 +11,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create deployment zip
-        run: |
-          zip -r aurora_site_deploy.zip . \
-            --exclude ".git/*" \
-            --exclude ".github/*" \
-            --exclude "*.md" \
-            --exclude "node_modules/*" \
-            --exclude "*.py"
-          echo "Zip size: $(du -sh aurora_site_deploy.zip)"
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
 
-      - name: Deploy to Hostinger
-        env:
-          HOSTINGER_TOKEN: ujqd3QL6BMCARTRpNwwwNJGqmTZ6CJRpyhWb0w5Iad6daa92
-        run: python3 deploy_to_hostinger.py
+      - name: Test FTP connectivity
+        run: |
+          echo "Testing FTP connection to 31.170.161.141:21"
+          timeout 15 bash -c "echo '' | nc -w 5 31.170.161.141 21" && echo "Port 21 OPEN" || echo "Port 21 CLOSED/TIMEOUT"
+
+      - name: Deploy via FTP
+        run: |
+          lftp -c "
+            set net:max-retries 3
+            set net:timeout 30
+            set ftp:ssl-allow false
+            set ssl:verify-certificate false
+            open ftp://31.170.161.141:21
+            user u637913108.auroraventures.agency 'PwJgi|lVx;5f8;Ms'
+            ls
+            mirror -R --parallel=5 \
+              --exclude-glob .git/ \
+              --exclude-glob .github/ \
+              --exclude-glob '*.md' \
+              --exclude-glob '*.py' \
+              . /
+            echo 'FTP upload complete'
+            bye
+          "
