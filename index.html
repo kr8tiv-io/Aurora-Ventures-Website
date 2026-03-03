@@ -2307,23 +2307,8 @@
             align-items: center;
             overflow: hidden;
             position: relative;
-            isolation: isolate;
-            /* contain:paint REMOVED — it scopes the stacking context and prevents
-               GSAP's position:fixed pin layer from rendering above siblings.       */
-            z-index: 100 !important; /* beats GSAP inline z-index write on pin     */
-            will-change: auto;       /* prevent GPU layer promotion that breaks compositing */
-            background: transparent;
-        }
-
-        /* Opaque paint-blocker via pseudo-element so the element's own
-           background stays transparent (consistent with the rest of the page)
-           while preventing cards / spectrum from bleeding through the pin.   */
-        #scroll-marquee::before {
-            content: '';
-            position: absolute;
-            inset: 0;
+            z-index: 100 !important;
             background-color: var(--c-bg, #02030a);
-            z-index: -1;
         }
 
         /* GSAP wraps every pinned section in a .pin-spacer div.
