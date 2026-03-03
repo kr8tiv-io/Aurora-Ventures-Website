@@ -2733,12 +2733,13 @@
 
             .nav-shell {
                 grid-template-columns: auto auto !important;
+                justify-content: space-between !important;
                 gap: 0.6rem !important;
                 padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem !important;
                 width: 94vw !important;
             }
 
-            .logo { margin-left: 4px; }
+            .logo { margin-left: 0; }
             .logo-wordmark { max-height: 24px; }
             .logo-symbol { max-height: 20px; }
 
@@ -2754,11 +2755,8 @@
             }
 
             .hero-title {
-                max-height: 220px;
+                max-height: 200px;
                 overflow: hidden;
-                transform: scale(0.75);
-                transform-origin: top center;
-                margin-bottom: -55px;
             }
 
             .hero-title [data-us-project] {
@@ -3042,7 +3040,10 @@
 
             .metric { font-size: 2.4rem !important; }
 
-            section { text-align: center; }
+            section {
+                text-align: center;
+                overflow-x: hidden !important;
+            }
 
             section .type-label,
             section .section-title,
@@ -3075,10 +3076,7 @@
 
             .hero-webgl { margin-top: -10px !important; }
             .hero-title {
-                max-height: 160px;
-                transform: scale(0.55);
-                transform-origin: top center;
-                margin-bottom: -72px;
+                max-height: 165px;
             }
 
             .hero-stage {
@@ -3139,10 +3137,7 @@
 
             .hero-webgl { margin-top: 0 !important; }
             .hero-title {
-                max-height: 140px;
-                transform: scale(0.52);
-                transform-origin: top center;
-                margin-bottom: -67px;
+                max-height: 145px;
             }
 
             .hero-tag {
@@ -3218,7 +3213,7 @@
     <div class="unicorn-wrapper">
         <div class="unicorn-embed" data-us-project="OD0dLxhY7upENTnJ2l1I"></div>
         <script type="text/javascript">
-            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: window.innerWidth <= 480 ? 0.5 : window.innerWidth <= 980 ? 0.6 : 1, dpi: window.innerWidth <= 480 ? 1.0 : window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
+            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: 1, dpi: window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
         </script>
         <div class="unicorn-overlay"></div>
         <div class="aurora-layer"></div>
@@ -3826,7 +3821,7 @@
         <div class="footer">Powered by Kr8tiv Multimedia</div>
     </main>
 
-    <script src="script.js?v=cyber-tundra-4"></script>
+    <script src="script.js?v=cyber-tundra-5"></script>
 </body>
 
 </html>
