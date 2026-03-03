@@ -1246,6 +1246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const founderContent = document.querySelector(".founder-content");
 
         if (founderSection && founderMedia && founderContent) {
+            const isMobile = window.innerWidth <= 980;
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: founderSection,
@@ -1255,17 +1256,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            tl.fromTo(
-                founderMedia,
-                { xPercent: -100, opacity: 0 },
-                { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
-                0
-            ).fromTo(
-                founderContent,
-                { xPercent: 100, opacity: 0 },
-                { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
-                0
-            );
+            if (isMobile) {
+                tl.fromTo(
+                    founderMedia,
+                    { y: 60, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                    0
+                ).fromTo(
+                    founderContent,
+                    { y: 60, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                    0.15
+                );
+            } else {
+                tl.fromTo(
+                    founderMedia,
+                    { xPercent: -100, opacity: 0 },
+                    { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                    0
+                ).fromTo(
+                    founderContent,
+                    { xPercent: 100, opacity: 0 },
+                    { xPercent: 0, opacity: 1, duration: 1.1, ease: "power3.out" },
+                    0
+                );
+            }
 
             const addTilt = (target) => {
                 const strength = 12;
