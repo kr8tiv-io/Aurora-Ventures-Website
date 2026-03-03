@@ -2734,12 +2734,13 @@
             .nav-shell {
                 grid-template-columns: auto auto !important;
                 justify-content: space-between !important;
+                margin-inline: auto !important;
                 gap: 0.6rem !important;
                 padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem !important;
                 width: 94vw !important;
             }
 
-            .logo { margin-left: 0; }
+            .logo { margin-left: 0 !important; }
             .logo-wordmark { max-height: 24px; }
             .logo-symbol { max-height: 20px; }
 
@@ -2929,7 +2930,8 @@
                 width: 100% !important;
                 display: grid !important;
                 grid-template-columns: 1fr !important;
-                padding: 0 5vw !important;
+                box-sizing: border-box;
+                padding: 0 4vw !important;
                 gap: 1.6rem !important;
             }
 
@@ -2962,6 +2964,7 @@
                 padding: 2rem 1.4rem !important;
                 text-align: center;
                 width: 90vw !important;
+                margin: 0 auto !important;
             }
 
             .jarvis-panel .section-body,
@@ -2992,6 +2995,8 @@
             .founder-content {
                 padding: 2rem 1.4rem !important;
                 text-align: center;
+                width: 90vw !important;
+                margin: 0 auto !important;
             }
 
             .founder-role,
@@ -3043,6 +3048,8 @@
             section {
                 text-align: center;
                 overflow-x: hidden !important;
+                padding-left: 4vw !important;
+                padding-right: 4vw !important;
             }
 
             section .type-label,
@@ -3076,7 +3083,7 @@
 
             .hero-webgl { margin-top: -10px !important; }
             .hero-title {
-                max-height: 165px;
+                max-height: 185px;
             }
 
             .hero-stage {
@@ -3137,7 +3144,7 @@
 
             .hero-webgl { margin-top: 0 !important; }
             .hero-title {
-                max-height: 145px;
+                max-height: 175px;
             }
 
             .hero-tag {
@@ -3213,7 +3220,53 @@
     <div class="unicorn-wrapper">
         <div class="unicorn-embed" data-us-project="OD0dLxhY7upENTnJ2l1I"></div>
         <script type="text/javascript">
-            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: 1, dpi: window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
+            (function () {
+                const HERO_PROJECT_ID = "tkOC2fdxK3BsgnJowsRV";
+                const BG_PROJECT_ID = "OD0dLxhY7upENTnJ2l1I";
+                const initConfig = {
+                    scale: 1,
+                    dpi: window.innerWidth <= 980 ? 1.0 : 1.5,
+                    altText: "Aurora",
+                    alpha: true
+                };
+
+                let initDone = false;
+
+                function initUnicorn() {
+                    if (initDone || !window.UnicornStudio || typeof window.UnicornStudio.init !== "function") {
+                        return;
+                    }
+
+                    const heroNode = document.querySelector('.hero-webgl[data-us-project="' + HERO_PROJECT_ID + '"]');
+                    const bgNode = document.querySelector('.unicorn-embed[data-us-project="' + BG_PROJECT_ID + '"]');
+
+                    if (!heroNode || !bgNode) {
+                        return;
+                    }
+
+                    window.UnicornStudio.init(initConfig);
+                    window.UnicornStudio.isInitialized = true;
+                    initDone = true;
+                }
+
+                function loadUnicornScript() {
+                    if (window.UnicornStudio && typeof window.UnicornStudio.init === "function") {
+                        initUnicorn();
+                        return;
+                    }
+
+                    const script = document.createElement("script");
+                    script.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js";
+                    script.onload = initUnicorn;
+                    (document.head || document.body).appendChild(script);
+                }
+
+                if (document.readyState === "complete") {
+                    loadUnicornScript();
+                } else {
+                    window.addEventListener("load", loadUnicornScript, { once: true });
+                }
+            })();
         </script>
         <div class="unicorn-overlay"></div>
         <div class="aurora-layer"></div>
@@ -3821,7 +3874,7 @@
         <div class="footer">Powered by Kr8tiv Multimedia</div>
     </main>
 
-    <script src="script.js?v=cyber-tundra-5"></script>
+    <script src="script.js?v=cyber-tundra-6"></script>
 </body>
 
 </html>
