@@ -1085,20 +1085,28 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Explicit enter/leave callbacks are deterministic regardless
                         // of direction.
                         onEnter: () => {
-                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "hidden");
-                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "hidden");
+                            const spectrum = document.getElementById("spectrum");
+                            const projects = document.querySelector(".projects-section");
+                            if (spectrum) { spectrum.style.setProperty("visibility", "hidden"); spectrum.style.setProperty("z-index", "-1"); }
+                            if (projects) { projects.style.setProperty("visibility", "hidden"); projects.style.setProperty("z-index", "-1"); }
                         },
                         onLeave: () => {
-                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "");
-                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "");
+                            const spectrum = document.getElementById("spectrum");
+                            const projects = document.querySelector(".projects-section");
+                            if (spectrum) { spectrum.style.removeProperty("visibility"); spectrum.style.removeProperty("z-index"); }
+                            if (projects) { projects.style.removeProperty("visibility"); projects.style.removeProperty("z-index"); }
                         },
                         onEnterBack: () => {
-                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "hidden");
-                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "hidden");
+                            const spectrum = document.getElementById("spectrum");
+                            const projects = document.querySelector(".projects-section");
+                            if (spectrum) { spectrum.style.setProperty("visibility", "hidden"); spectrum.style.setProperty("z-index", "-1"); }
+                            if (projects) { projects.style.setProperty("visibility", "hidden"); projects.style.setProperty("z-index", "-1"); }
                         },
                         onLeaveBack: () => {
-                            document.getElementById("spectrum")         ?.style.setProperty("visibility", "");
-                            document.querySelector(".projects-section") ?.style.setProperty("visibility", "");
+                            const spectrum = document.getElementById("spectrum");
+                            const projects = document.querySelector(".projects-section");
+                            if (spectrum) { spectrum.style.removeProperty("visibility"); spectrum.style.removeProperty("z-index"); }
+                            if (projects) { projects.style.removeProperty("visibility"); projects.style.removeProperty("z-index"); }
                         }
                         // NOTE: No manual window resize listener here.
                         // ScrollTrigger debounces resize internally. Adding a manual
