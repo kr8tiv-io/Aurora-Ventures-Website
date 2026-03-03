@@ -2750,6 +2750,9 @@
             .hero-title {
                 max-height: 220px;
                 overflow: hidden;
+                transform: scale(0.75);
+                transform-origin: top center;
+                margin-bottom: -55px;
             }
 
             .hero-title [data-us-project] {
@@ -3065,7 +3068,12 @@
             }
 
             .hero-webgl { margin-top: -35px !important; }
-            .hero-title { max-height: 160px; }
+            .hero-title {
+                max-height: 160px;
+                transform: scale(0.55);
+                transform-origin: top center;
+                margin-bottom: -72px;
+            }
 
             .hero-stage {
                 padding: 2rem 1.2rem 1.6rem !important;
@@ -3124,7 +3132,12 @@
             }
 
             .hero-webgl { margin-top: -20px !important; }
-            .hero-title { max-height: 120px; }
+            .hero-title {
+                max-height: 120px;
+                transform: scale(0.45);
+                transform-origin: top center;
+                margin-bottom: -66px;
+            }
 
             .hero-tag {
                 font-size: 0.45rem;
@@ -3199,7 +3212,7 @@
     <div class="unicorn-wrapper">
         <div class="unicorn-embed" data-us-project="OD0dLxhY7upENTnJ2l1I"></div>
         <script type="text/javascript">
-            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: window.innerWidth <= 980 ? 0.6 : 1, dpi: window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
+            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: window.innerWidth <= 480 ? 0.3 : window.innerWidth <= 980 ? 0.6 : 1, dpi: window.innerWidth <= 480 ? 0.75 : window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
         </script>
         <div class="unicorn-overlay"></div>
         <div class="aurora-layer"></div>
