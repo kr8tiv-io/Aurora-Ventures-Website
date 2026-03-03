@@ -2721,12 +2721,18 @@
 
         @media (max-width: 980px) {
 
+            /* Reduce section side-padding so 90vw children fit + center */
+            section {
+                padding-left: 4vw;
+                padding-right: 4vw;
+            }
+
             .nav {
                 top: 0.8rem;
             }
 
             .nav-shell {
-                grid-template-columns: 1fr auto !important;
+                grid-template-columns: auto auto !important;
                 gap: 0.6rem !important;
                 padding: calc(0.5rem + env(safe-area-inset-top, 0px)) 1rem !important;
                 width: 94vw !important;
@@ -2742,7 +2748,7 @@
             }
 
             .hero-webgl {
-                margin-top: -60px !important;
+                margin-top: -20px !important;
                 max-width: 100% !important;
                 width: 100% !important;
             }
@@ -3067,7 +3073,7 @@
                 font-size: 0.5rem;
             }
 
-            .hero-webgl { margin-top: -35px !important; }
+            .hero-webgl { margin-top: -10px !important; }
             .hero-title {
                 max-height: 160px;
                 transform: scale(0.55);
@@ -3131,12 +3137,12 @@
                 width: 96vw;
             }
 
-            .hero-webgl { margin-top: -20px !important; }
+            .hero-webgl { margin-top: 0 !important; }
             .hero-title {
-                max-height: 120px;
-                transform: scale(0.45);
+                max-height: 140px;
+                transform: scale(0.52);
                 transform-origin: top center;
-                margin-bottom: -66px;
+                margin-bottom: -67px;
             }
 
             .hero-tag {
@@ -3212,7 +3218,7 @@
     <div class="unicorn-wrapper">
         <div class="unicorn-embed" data-us-project="OD0dLxhY7upENTnJ2l1I"></div>
         <script type="text/javascript">
-            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: window.innerWidth <= 480 ? 0.3 : window.innerWidth <= 980 ? 0.6 : 1, dpi: window.innerWidth <= 480 ? 0.75 : window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
+            !function () { if (!window.UnicornStudio) { window.UnicornStudio = { isInitialized: !1 }; var i = document.createElement("script"); i.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.0/dist/unicornStudio.umd.js", i.onload = function () { window.UnicornStudio.isInitialized || (UnicornStudio.init({ scale: window.innerWidth <= 480 ? 0.5 : window.innerWidth <= 980 ? 0.6 : 1, dpi: window.innerWidth <= 480 ? 1.0 : window.innerWidth <= 980 ? 1.0 : 1.5, altText: "Aurora", alpha: true }), window.UnicornStudio.isInitialized = !0) }, (document.head || document.body).appendChild(i) } }();
         </script>
         <div class="unicorn-overlay"></div>
         <div class="aurora-layer"></div>
@@ -3820,7 +3826,7 @@
         <div class="footer">Powered by Kr8tiv Multimedia</div>
     </main>
 
-    <script src="script.js?v=cyber-tundra-3"></script>
+    <script src="script.js?v=cyber-tundra-4"></script>
 </body>
 
 </html>
