@@ -1061,7 +1061,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     scrollTrigger: {
                         trigger:          marqueeSection,
                         start:            "top top",
-                        end:              () => "+=" + (marqueeTrack.scrollWidth - window.innerWidth),
+                        end:              () => "+=" + Math.min(marqueeTrack.scrollWidth - window.innerWidth, window.innerHeight * 2),
                         scrub:            true,
                         pin:              true,
                         pinSpacing:       true,
