@@ -14,34 +14,43 @@ jobs:
       - name: Install lftp
         run: sudo apt-get install -y lftp
 
-      - name: Deploy via FTP (direct put)
+      - name: Deploy via FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
+          if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASSWORD" ]; then
+            echo "::error::FTP credentials not configured. Set FTP_HOST, FTP_USER, FTP_PASSWORD in repo secrets."
+            exit 1
+          fi
           lftp -c "
             set net:max-retries 3
             set net:timeout 30
             set ftp:ssl-allow false
             set ssl:verify-certificate false
             set ftp:use-feat no
-            open ftp://31.170.161.141:21
-            user u637913108.auroraventures.agency 'PwJgi|lVx;5f8;Ms'
-            echo '=== PRE-UPLOAD ls ==='
+            open ftp://$FTP_HOS/mnt/t///21
+            user $FTP_USER "$FTP_PASSWORD"
+            echo "=== PRE-UPLOAD ls ==="
             ls
-            echo '=== Uploading index.html ==='
+            echo "=== Uploading index.html ==="
             put index.html -o index.html
-            echo '=== Uploading script.js ==='
+            echo "=== Uploading script.js ==="
             put script.js -o script.js
-            echo '=== Uploading assets (mirror) ==='
+            echo "=== Uploading assets (mirror) ==="
             mirror -R --parallel=5 --transfer-all assets/ assets/
-            echo '=== POST-UPLOAD ls ==='
+            echo "=== POST-UPLOAD ls ==="
             ls
-            echo '=== Verifying fix in index.html ==='
+            echo "=== Verifying fix in index.html ==="
             get index.html -o /tmp/verify.html
-            echo 'Deploy complete'
+            echo "Deploy complete"
             bye
           "
 
       - name: Verify fix applied
         run: |
-          grep -c 'projects-section.*hidden\|hidden.*projects-section\|projects.*visibility' /tmp/verify.html && echo 'JS FIX CONFIRMED' || echo 'checking index...'
-          grep -c 'overflow: hidden' /tmp/verify.html && echo 'CSS OVERFLOW CONFIRMED' || echo 'CSS NOT FOUND'
+          grep -c "projects-section.*hidden\|hidden.*projects-section\|projects.*visibility" /tmp/verify.html && echo "JS FIX CONFIRMED" || echo "checking index..."
+          grep -c "overflow: hidden" /tmp/verify.html && echo "CSS OVERFLOW CONFIRMED" || echo "CSS NOT FOUND"
           wc -c /tmp/verify.html
